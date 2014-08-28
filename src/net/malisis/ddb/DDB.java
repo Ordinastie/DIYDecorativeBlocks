@@ -58,7 +58,7 @@ public class DDB implements IMalisisMod
 	{
 		instance = this;
 		MalisisCore.registerMod(this);
-		DDBPack.readPackFolder();
+		BlockPack.readPackFolder();
 	}
 
 	@Override

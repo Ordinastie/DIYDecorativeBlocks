@@ -24,13 +24,42 @@
 
 package net.malisis.ddb;
 
+import java.lang.reflect.Type;
+import java.util.Map.Entry;
+
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 
 /**
  * @author Ordinastie
  * 
  */
-public class PackDescriptor
+public class BlockPackDeserializer implements JsonDeserializer<BlockPack>
 {
-	public String name;
-	public BlockDescriptor[] blocks;
+	private BlockPack pack;
+
+	public BlockPackDeserializer(BlockPack pack)
+	{
+		this.pack = pack;
+	}
+
+	@Override
+	public BlockPack deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException
+	{
+		JsonObject blocks = json.getAsJsonObject();
+
+		for (Entry<String, JsonElement> entry : blocks.entrySet())
+		{
+			BlockDescriptor desc = context.deserialize(entry.getValue(), BlockDescriptor.class);
+			desc.name = entry.getKey();
+
+			pack.registerBlock(desc.createBlock(pack));
+
+		}
+		return null;
+	}
+
 }

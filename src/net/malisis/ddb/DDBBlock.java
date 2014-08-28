@@ -34,26 +34,33 @@ import net.minecraft.client.renderer.texture.TextureMap;
  */
 public class DDBBlock extends Block
 {
-	private DDBPack pack;
+	private BlockPack pack;
 	private BlockDescriptor descriptor;
 
-	protected DDBBlock(DDBPack pack, BlockDescriptor descriptor)
+	protected DDBBlock(BlockPack pack, BlockDescriptor descriptor)
 	{
-		super(descriptor.material);
+		super(descriptor.getMaterial());
 		this.pack = pack;
 		this.descriptor = descriptor;
 
-		setBlockName(descriptor.name);
+		setBlockName(pack.getName() + "_" + descriptor.name);
 		setHardness(descriptor.hardness);
-		setStepSound(descriptor.soundType);
+		setStepSound(descriptor.getSoundType());
+
 		setCreativeTab(DDB.tab);
+	}
+
+	public String getName()
+	{
+		return getUnlocalizedName().substring(5);
 	}
 
 	@Override
 	public void registerBlockIcons(IIconRegister register)
 	{
-		DDBIcon icon = new DDBIcon(descriptor.name, getTexturePath());
+		DDBIcon icon = new DDBIcon(getName(), getTexturePath());
 		icon.register((TextureMap) register);
+		this.blockIcon = icon;
 	}
 
 	public String getTexturePath()
