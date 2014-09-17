@@ -26,9 +26,13 @@ package net.malisis.ddb;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.HashMap;
+import java.util.zip.ZipFile;
+
+import net.malisis.ddb.block.DDBBlock;
 
 import org.apache.commons.io.FileUtils;
 
@@ -44,45 +48,119 @@ import cpw.mods.fml.common.registry.GameRegistry;
  */
 public class BlockPack
 {
+	public enum Type
+	{
+		FOLDER, ZIP
+	};
+
 	public static String PACKDIR = "ddbpacks";
 	public static HashMap<String, BlockPack> packs = new HashMap<>();
 
+	private Type type;
 	private String name;
-	private boolean loaded = false;
+	private ZipFile zipFile;
+
 	private HashMap<String, DDBBlock> blocks = new HashMap<>();
 
-	public BlockPack(String name, File container)
+	public BlockPack(File file)
 	{
-		this.name = name;
+		if (file.isDirectory())
+		{
+			this.name = file.getName();
+			this.type = Type.FOLDER;
+		}
+		else if (file.getName().endsWith(".zip"))
+		{
+			this.name = file.getName().substring(0, file.getName().length() - 4);
+			this.type = Type.ZIP;
+			try
+			{
+				this.zipFile = new ZipFile(file);
+			}
+			catch (IOException e)
+			{
+				DDB.log.error("Could not read zip file {} : \n{}", file.getName(), e.getMessage());
+			}
+		}
+		else
+		{
+			DDB.log.error("Skipping {}, not a valid DDB pack file.", file.getName());
+			return;
+		}
+
+		InputStream inputStream;
+		try
+		{
+			inputStream = getInputStream(name + ".json");
+		}
+		catch (IOException e)
+		{
+			DDB.log.error("Skipping {}, couldn't read {}.json : \n{}", file.getName(), name, e.getMessage());
+			return;
+		}
 
 		GsonBuilder gsonBuilder = new GsonBuilder();
 		gsonBuilder.registerTypeAdapter(BlockPack.class, new BlockPackDeserializer(this));
 		Gson gson = gsonBuilder.create();
 
-		try (Reader reader = new InputStreamReader(FileUtils.openInputStream(new File(container, name + ".json")), "UTF-8"))
+		try (Reader reader = new InputStreamReader(inputStream, "UTF-8"))
 		{
 			gson.fromJson(reader, BlockPack.class);
-			loaded = true;
 		}
 		catch (IOException | JsonSyntaxException e)
 		{
-			DDB.log.error("Could not read DDB pack {} : \n{}", name, e);
+			DDB.log.error("Failed to read {}.json : \n{}", name, e.getMessage());
+			return;
 		}
+
+		registerPack(this);
 	}
 
+	/**
+	 * Gets the name of this <code>BlockPack</code>.
+	 * 
+	 * @return
+	 */
 	public String getName()
 	{
 		return name;
 	}
 
+	/**
+	 * Gets the type of this <code>BlockPack</code>
+	 * 
+	 * @return
+	 */
+	public Type getType()
+	{
+		return type;
+	}
+
+	/**
+	 * Gets the working directory of this <code>BlockPack</code>.
+	 * 
+	 * @return
+	 */
 	public String getDirectory()
 	{
 		return "./" + PACKDIR + "/" + name + "/";
 	}
 
-	public boolean isLoaded()
+	/**
+	 * Gets an inputStream from this <code>BlockPack</code> for the <i>path</i>.
+	 * 
+	 * @param path
+	 * @return
+	 * @throws IOException
+	 */
+	public InputStream getInputStream(String path) throws IOException
 	{
-		return loaded;
+		if (type == Type.FOLDER)
+			return FileUtils.openInputStream(new File(getDirectory() + path));
+		else if (type == Type.ZIP && zipFile != null)
+			return zipFile.getInputStream(zipFile.getEntry(path));
+
+		throw new IOException();
 	}
 
 	/**
@@ -97,14 +175,28 @@ public class BlockPack
 	}
 
 	/**
-	 * Registers the <i>block</i> in game registy and this <code>BlockPack</code>
+	 * Adds the <i>block</i> in this <code>BlockPack</code>
 	 * 
 	 * @param block
 	 */
-	public void registerBlock(DDBBlock block)
+	public void addBlock(DDBBlock block)
 	{
-		GameRegistry.registerBlock(block, block.getName());
+
 		blocks.put(block.getName(), block);
+	}
+
+	/**
+	 * Registers all the block of this <code>BlockPack</code> to the GameRegistry
+	 */
+	public void registerBlocks()
+	{
+		for (DDBBlock block : blocks.values())
+		{
+			if (block.getBlockType() == BlockType.COLORED)
+				GameRegistry.registerBlock(block, DDBItemColored.class, block.getName());
+			else
+				GameRegistry.registerBlock(block, block.getName());
+		}
 	}
 
 	/**
@@ -115,11 +207,7 @@ public class BlockPack
 		File packDir = new File("./" + PACKDIR);
 
 		for (File file : packDir.listFiles())
-		{
-			if (file.isDirectory())
-				BlockPack.registerPack(new BlockPack(file.getName(), file));
-			//TODO: read from zip
-		}
+			new BlockPack(file);
 	}
 
 	/**
@@ -130,6 +218,7 @@ public class BlockPack
 	public static void registerPack(BlockPack pack)
 	{
 		String name = pack.getName();
+
 		if (packs.get(name) == null)
 			packs.put(pack.getName(), pack);
 		else
@@ -137,10 +226,19 @@ public class BlockPack
 	}
 
 	/**
+	 * Registers every blocks of every packs
+	 */
+	public static void registerAllBlocks()
+	{
+		for (BlockPack pack : packs.values())
+			pack.registerBlocks();
+	}
+
+	/**
 	 * Gets a <code>BlockPack</code> with the specified name
 	 * 
 	 * @param name
-	 * @return
+	 * @return the <code>DDBPack</code> if found or <b>null</b> if <i>packName</i> doesn't match any pack registered
 	 */
 	public static BlockPack getPack(String name)
 	{
@@ -152,7 +250,7 @@ public class BlockPack
 	 * 
 	 * @param packName
 	 * @param blockName
-	 * @return the <code>DDBBlock</code> if found or <b>null</b> if the <i>packName</i> is doesn't match any pack registered of if the
+	 * @return the <code>DDBBlock</code> if found or <b>null</b> if the <i>packName</i> doesn't match any pack registered or if the
 	 *         <i>blockName</i> doesn't match any block registered for that pack
 	 */
 	public static DDBBlock getBlock(String packName, String blockName)

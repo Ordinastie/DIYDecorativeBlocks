@@ -22,45 +22,47 @@
  * THE SOFTWARE.
  */
 
-package net.malisis.ddb;
+package net.malisis.ddb.renderer;
 
-import java.lang.reflect.Type;
-import java.util.Map.Entry;
+import java.util.List;
 
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
+import net.malisis.core.renderer.BaseRenderer;
+import net.malisis.core.renderer.RenderParameters;
+import net.malisis.core.renderer.preset.ShapePreset;
+import net.malisis.ddb.block.DDBStairs;
+import net.minecraft.util.AxisAlignedBB;
 
 /**
  * @author Ordinastie
  * 
  */
-public class BlockPackDeserializer implements JsonDeserializer<BlockPack>
+public class StairsRenderer extends BaseRenderer
 {
-	private BlockPack pack;
-
-	public BlockPackDeserializer(BlockPack pack)
+	@Override
+	protected void initParameters()
 	{
-		this.pack = pack;
+		rp = new RenderParameters();
+		rp.useBlockBounds.set(false);
 	}
 
 	@Override
-	public BlockPack deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException
+	protected void initShapes()
 	{
-		JsonObject blocks = json.getAsJsonObject();
-
-		for (Entry<String, JsonElement> entry : blocks.entrySet())
-		{
-			BlockDescriptor desc = context.deserialize(entry.getValue(), BlockDescriptor.class);
-			desc.name = entry.getKey();
-			if (desc.textures != null && desc.textures.get("front") != null && desc.type == BlockType.STANDARD)
-				desc.type = BlockType.DIRECTIONAL;
-
-			pack.addBlock(desc.createBlock(pack));
-		}
-		return null;
+		shape = ShapePreset.Cube();
 	}
 
+	@Override
+	public void render()
+	{
+
+		rp.useBlockBounds.set(false);
+		rp.interpolateUV.set(true);
+		List<AxisAlignedBB> list = ((DDBStairs) block).getBounds(world, x, y, z);
+		for (AxisAlignedBB aabb : list)
+		{
+			shape.resetState();
+			rp.renderBounds.set(aabb);
+			drawShape(shape, rp);
+		}
+	}
 }

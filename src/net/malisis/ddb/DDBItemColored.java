@@ -25,46 +25,34 @@
 package net.malisis.ddb;
 
 import net.minecraft.block.Block;
-import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.client.renderer.texture.TextureMap;
+import net.minecraft.item.ItemBlock;
+import net.minecraft.item.ItemDye;
+import net.minecraft.item.ItemStack;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 /**
  * @author Ordinastie
  * 
  */
-public class DDBBlock extends Block
+public class DDBItemColored extends ItemBlock
 {
-	private BlockPack pack;
-	private BlockDescriptor descriptor;
-
-	protected DDBBlock(BlockPack pack, BlockDescriptor descriptor)
+	public DDBItemColored(Block block)
 	{
-		super(descriptor.getMaterial());
-		this.pack = pack;
-		this.descriptor = descriptor;
-
-		setBlockName(pack.getName() + "_" + descriptor.name);
-		setHardness(descriptor.hardness);
-		setStepSound(descriptor.getSoundType());
-
-		setCreativeTab(DDB.tab);
-	}
-
-	public String getName()
-	{
-		return getUnlocalizedName().substring(5);
+		super(block);
+		setHasSubtypes(true);
 	}
 
 	@Override
-	public void registerBlockIcons(IIconRegister register)
+	public String getUnlocalizedName(ItemStack itemStack)
 	{
-		DDBIcon icon = new DDBIcon(getName(), getTexturePath());
-		icon.register((TextureMap) register);
-		this.blockIcon = icon;
+		return getUnlocalizedName() + "_" + ItemDye.field_150921_b[~itemStack.getItemDamage() & 15];
 	}
 
-	public String getTexturePath()
+	@Override
+	@SideOnly(Side.CLIENT)
+	public int getColorFromItemStack(ItemStack itemStack, int pass)
 	{
-		return pack.getDirectory() + (descriptor.textureName != null ? descriptor.textureName : descriptor.name);
+		return this.field_150939_a.getBlockColor();
 	}
 }

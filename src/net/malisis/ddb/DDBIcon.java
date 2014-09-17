@@ -25,14 +25,12 @@
 package net.malisis.ddb;
 
 import java.awt.image.BufferedImage;
-import java.io.FileInputStream;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import net.malisis.core.renderer.MalisisIcon;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
 
@@ -40,15 +38,16 @@ import net.minecraft.util.ResourceLocation;
  * @author Ordinastie
  * 
  */
-public class DDBIcon extends TextureAtlasSprite
+public class DDBIcon extends MalisisIcon
 {
 	private String path;
+	private BlockPack pack;
 
-	protected DDBIcon(String name, String path)
+	public DDBIcon(String name, BlockPack pack, String path)
 	{
 		super(name);
+		this.pack = pack;
 		this.path = path;
-
 	}
 
 	@Override
@@ -67,24 +66,25 @@ public class DDBIcon extends TextureAtlasSprite
 		try
 		{
 			BufferedImage[] textures = new BufferedImage[1 + mipmapLevels];
-			textures[0] = ImageIO.read(new FileInputStream(path + ".png"));
+			textures[0] = ImageIO.read(pack.getInputStream(path + ".png"));
 			loadSprite(textures, null, anisotropic);
+			return false;
 		}
 		catch (RuntimeException e)
 		{
-			DDB.log.error("Unable to parse metadata from " + getIconName(), e);
+			DDB.log.error("Unable to parse metadata from " + getIconName(), e.getMessage());
+			return true;
 		}
 		catch (IOException e)
 		{
-			DDB.log.error("Using missing texture, unable to load " + location, e);
+			DDB.log.error("Using missing texture, unable to load " + getIconName(), e.getMessage());
+			return true;
 		}
-
-		return false;
 	}
 
-	public void register(TextureMap map)
+	@Override
+	public void initSprite(int width, int height, int x, int y, boolean rotated)
 	{
-		map.setTextureEntry(getIconName(), this);
+		super.initSprite(width, height, x, y, rotated);
 	}
-
 }

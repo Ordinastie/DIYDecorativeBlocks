@@ -24,12 +24,25 @@
 
 package net.malisis.ddb;
 
+import com.google.gson.annotations.SerializedName;
+
 /**
  * @author Ordinastie
  * 
  */
 public enum BlockType
 {
-	STANDARD,
+	//@formatter:off
+	@SerializedName("standard")
+	STANDARD, 
+	@SerializedName("directional")
+	DIRECTIONAL, 
+	@SerializedName("colored")
+	COLORED,
+	@SerializedName("connected")
+	CONNECTED,
+	@SerializedName("stairs")
+	STAIRS,
+	//@formatter:on
 
 }

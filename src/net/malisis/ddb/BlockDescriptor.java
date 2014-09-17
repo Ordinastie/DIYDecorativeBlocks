@@ -26,9 +26,16 @@ package net.malisis.ddb;
 
 import java.util.HashMap;
 
+import net.malisis.ddb.block.DDBBlock;
+import net.malisis.ddb.block.DDBBlockColored;
+import net.malisis.ddb.block.DDBBlockConnected;
+import net.malisis.ddb.block.DDBStairs;
 import net.minecraft.block.Block;
 import net.minecraft.block.Block.SoundType;
 import net.minecraft.block.material.Material;
+import net.minecraftforge.common.util.ForgeDirection;
+
+import com.google.gson.internal.LinkedTreeMap;
 
 /**
  * @author Ordinastie
@@ -91,9 +98,12 @@ public class BlockDescriptor
 	public BlockType type = BlockType.STANDARD;
 	public String name;
 	public String textureName = name;
+	public LinkedTreeMap<String, String> textures;
 	public String material;
-	public float hardness = 3.0F;
+	public float hardness = 2.0F;
 	public String soundType;
+	public boolean useColorMultiplier = false;
+	public boolean opaque = true;
 
 	public DDBBlock createBlock(BlockPack pack)
 	{
@@ -101,7 +111,20 @@ public class BlockDescriptor
 		switch (type)
 		{
 			case STANDARD:
+			case DIRECTIONAL:
 				block = new DDBBlock(pack, this);
+				break;
+			case COLORED:
+				block = new DDBBlockColored(pack, this);
+				break;
+			case CONNECTED:
+				block = new DDBBlockConnected(pack, this);
+				break;
+			case STAIRS:
+				block = new DDBStairs(pack, this);
+				break;
+			default:
+				break;
 		}
 
 		return block;
@@ -117,5 +140,31 @@ public class BlockDescriptor
 	{
 		SoundType sound = soundTypes.get(soundType);
 		return sound != null ? sound : Block.soundTypeWood;
+	}
+
+	public String getTexture()
+	{
+		return textureName != null ? textureName : name;
+	}
+
+	public String getTexture(ForgeDirection dir)
+	{
+		String textureName = null;
+		if (textures != null)
+		{
+			if (dir == ForgeDirection.DOWN)
+				textureName = textures.get("bottom");
+			else if (dir == ForgeDirection.UP)
+				textureName = textures.get("top");
+			else
+			{
+				if (dir == ForgeDirection.SOUTH)
+					textureName = textures.get("front");
+				if (textureName == null)
+					textureName = textures.get("sides");
+			}
+		}
+
+		return textureName;
 	}
 }

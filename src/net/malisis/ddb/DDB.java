@@ -27,6 +27,8 @@ package net.malisis.ddb;
 import net.malisis.core.IMalisisMod;
 import net.malisis.core.MalisisCore;
 import net.malisis.core.configuration.Settings;
+import net.malisis.ddb.block.DDBStairs;
+import net.malisis.ddb.renderer.StairsRenderer;
 import net.minecraft.creativetab.CreativeTabs;
 
 import org.apache.logging.log4j.LogManager;
@@ -35,6 +37,7 @@ import org.apache.logging.log4j.Logger;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
+import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 
 /**
@@ -88,7 +91,12 @@ public class DDB implements IMalisisMod
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event)
 	{
-
+		BlockPack.registerAllBlocks();
 	}
 
+	@EventHandler
+	public void init(FMLInitializationEvent event)
+	{
+		new StairsRenderer().registerFor(DDBStairs.class);
+	}
 }
