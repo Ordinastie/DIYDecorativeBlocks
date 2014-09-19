@@ -29,6 +29,7 @@ import java.util.List;
 import net.malisis.ddb.BlockDescriptor;
 import net.malisis.ddb.BlockPack;
 import net.malisis.ddb.DDBIcon;
+import net.malisis.ddb.item.DDBItemColored;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.client.renderer.texture.TextureMap;
@@ -53,6 +54,12 @@ public class DDBBlockColored extends DDBBlock
 	public DDBBlockColored(BlockPack pack, BlockDescriptor descriptor)
 	{
 		super(pack, descriptor);
+	}
+
+	@Override
+	public Class getItemClass()
+	{
+		return DDBItemColored.class;
 	}
 
 	/**

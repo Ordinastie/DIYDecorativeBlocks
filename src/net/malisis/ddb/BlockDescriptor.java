@@ -29,7 +29,9 @@ import java.util.HashMap;
 import net.malisis.ddb.block.DDBBlock;
 import net.malisis.ddb.block.DDBBlockColored;
 import net.malisis.ddb.block.DDBBlockConnected;
+import net.malisis.ddb.block.DDBSlab;
 import net.malisis.ddb.block.DDBStairs;
+import net.malisis.ddb.item.DDBItem;
 import net.minecraft.block.Block;
 import net.minecraft.block.Block.SoundType;
 import net.minecraft.block.material.Material;
@@ -107,27 +109,27 @@ public class BlockDescriptor
 
 	public DDBBlock createBlock(BlockPack pack)
 	{
-		DDBBlock block = null;
 		switch (type)
 		{
 			case STANDARD:
 			case DIRECTIONAL:
-				block = new DDBBlock(pack, this);
-				break;
+				return new DDBBlock(pack, this);
 			case COLORED:
-				block = new DDBBlockColored(pack, this);
-				break;
+				return new DDBBlockColored(pack, this);
 			case CONNECTED:
-				block = new DDBBlockConnected(pack, this);
-				break;
+				return new DDBBlockConnected(pack, this);
 			case STAIRS:
-				block = new DDBStairs(pack, this);
-				break;
+				return new DDBStairs(pack, this);
+			case SLAB:
+				return new DDBSlab(pack, this);
 			default:
-				break;
+				return null;
 		}
+	}
 
-		return block;
+	public DDBItem createItem(DDBBlock block)
+	{
+		return null;
 	}
 
 	public Material getMaterial()

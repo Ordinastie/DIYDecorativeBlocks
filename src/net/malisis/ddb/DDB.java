@@ -49,7 +49,7 @@ public class DDB implements IMalisisMod
 {
 	public static final String modid = "ddb";
 	public static final String modname = "DIY Decorative Blocks";
-	public static final String version = "1.7.10-0.1";
+	public static final String version = "${version}";
 
 	public static Logger log = LogManager.getLogger(modid);
 	public static CreativeTabs tab = new DDBTab();
@@ -91,7 +91,8 @@ public class DDB implements IMalisisMod
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event)
 	{
-		BlockPack.registerAllBlocks();
+		for (BlockPack pack : BlockPack.getListPacks())
+			pack.registerBlocks();
 	}
 
 	@EventHandler

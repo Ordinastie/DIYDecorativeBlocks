@@ -22,37 +22,29 @@
  * THE SOFTWARE.
  */
 
-package net.malisis.ddb;
+package net.malisis.ddb.item;
 
-import net.minecraft.block.Block;
+import net.malisis.ddb.block.DDBBlock;
 import net.minecraft.item.ItemBlock;
-import net.minecraft.item.ItemDye;
-import net.minecraft.item.ItemStack;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 /**
  * @author Ordinastie
  * 
  */
-public class DDBItemColored extends ItemBlock
+public class DDBItem extends ItemBlock
 {
-	public DDBItemColored(Block block)
+	public DDBItem(DDBBlock block)
 	{
 		super(block);
-		setHasSubtypes(true);
 	}
 
-	@Override
-	public String getUnlocalizedName(ItemStack itemStack)
+	public String getName()
 	{
-		return getUnlocalizedName() + "_" + ItemDye.field_150921_b[~itemStack.getItemDamage() & 15];
+		return getBlock().getName();
 	}
 
-	@Override
-	@SideOnly(Side.CLIENT)
-	public int getColorFromItemStack(ItemStack itemStack, int pass)
+	public DDBBlock getBlock()
 	{
-		return this.field_150939_a.getBlockColor();
+		return (DDBBlock) field_150939_a;
 	}
 }

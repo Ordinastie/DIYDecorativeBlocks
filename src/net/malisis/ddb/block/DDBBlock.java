@@ -34,6 +34,7 @@ import net.minecraft.block.Block;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
@@ -75,6 +76,11 @@ public class DDBBlock extends Block
 		return descriptor.type;
 	}
 
+	public Class getItemClass()
+	{
+		return ItemBlock.class;
+	}
+
 	@Override
 	public void registerBlockIcons(IIconRegister register)
 	{
@@ -83,9 +89,6 @@ public class DDBBlock extends Block
 		DDBIcon icon = new DDBIcon(getName(), pack, descriptor.getTexture());
 		icon.register((TextureMap) register);
 		blockIcon = icon;
-
-		if (descriptor.type != BlockType.STANDARD && descriptor.type != BlockType.DIRECTIONAL)
-			return;
 
 		for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS)
 		{

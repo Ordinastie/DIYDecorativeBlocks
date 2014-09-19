@@ -43,6 +43,8 @@ public enum BlockType
 	CONNECTED,
 	@SerializedName("stairs")
 	STAIRS,
+	@SerializedName("slab")
+	SLAB,
 	//@formatter:on
 
 }

@@ -22,48 +22,37 @@
  * THE SOFTWARE.
  */
 
-package net.malisis.ddb;
-
-import java.lang.reflect.Type;
-import java.util.Map.Entry;
+package net.malisis.ddb.item;
 
 import net.malisis.ddb.block.DDBBlock;
-
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
+import net.minecraft.block.Block;
+import net.minecraft.item.ItemDye;
+import net.minecraft.item.ItemStack;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 /**
  * @author Ordinastie
  * 
  */
-public class BlockPackDeserializer implements JsonDeserializer<BlockPack>
+public class DDBItemColored extends DDBItem
 {
-	private BlockPack pack;
-
-	public BlockPackDeserializer(BlockPack pack)
+	public DDBItemColored(Block block)
 	{
-		this.pack = pack;
+		super((DDBBlock) block);
+		setHasSubtypes(true);
 	}
 
 	@Override
-	public BlockPack deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException
+	public String getUnlocalizedName(ItemStack itemStack)
 	{
-		JsonObject blocks = json.getAsJsonObject();
-
-		for (Entry<String, JsonElement> entry : blocks.entrySet())
-		{
-			BlockDescriptor desc = context.deserialize(entry.getValue(), BlockDescriptor.class);
-			desc.name = entry.getKey();
-			if (desc.textures != null && desc.textures.get("front") != null && desc.type == BlockType.STANDARD)
-				desc.type = BlockType.DIRECTIONAL;
-
-			DDBBlock block = desc.createBlock(pack);
-			pack.addBlock(block);
-		}
-		return null;
+		return getUnlocalizedName() + "_" + ItemDye.field_150921_b[~itemStack.getItemDamage() & 15];
 	}
 
+	@Override
+	@SideOnly(Side.CLIENT)
+	public int getColorFromItemStack(ItemStack itemStack, int pass)
+	{
+		return this.field_150939_a.getBlockColor();
+	}
 }

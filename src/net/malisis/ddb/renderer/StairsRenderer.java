@@ -24,6 +24,7 @@
 
 package net.malisis.ddb.renderer;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import net.malisis.core.renderer.BaseRenderer;
@@ -43,6 +44,8 @@ public class StairsRenderer extends BaseRenderer
 	{
 		rp = new RenderParameters();
 		rp.useBlockBounds.set(false);
+		rp.renderAllFaces.set(true);
+		rp.interpolateUV.set(true);
 	}
 
 	@Override
@@ -54,15 +57,29 @@ public class StairsRenderer extends BaseRenderer
 	@Override
 	public void render()
 	{
-
 		rp.useBlockBounds.set(false);
-		rp.interpolateUV.set(true);
-		List<AxisAlignedBB> list = ((DDBStairs) block).getBounds(world, x, y, z);
+
+		List<AxisAlignedBB> list = null;
+		if (renderType == TYPE_ISBRH_WORLD)
+			list = ((DDBStairs) block).getBounds(world, x, y, z);
+		else
+		{
+			list = new ArrayList<>();
+			list.add(AxisAlignedBB.getBoundingBox(0, 0, 0, 1, 0.5F, 1));
+			list.add(AxisAlignedBB.getBoundingBox(0, 0.5F, 0, 1, 1, 0.5F));
+		}
+
 		for (AxisAlignedBB aabb : list)
 		{
 			shape.resetState();
 			rp.renderBounds.set(aabb);
 			drawShape(shape, rp);
 		}
+	}
+
+	@Override
+	public boolean shouldRender3DInInventory(int modelId)
+	{
+		return true;
 	}
 }

@@ -29,10 +29,18 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.Collection;
+import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import net.malisis.ddb.block.DDBBlock;
+import net.malisis.ddb.item.DDBItem;
+import net.minecraft.util.StringTranslate;
 
 import org.apache.commons.io.FileUtils;
 
@@ -41,6 +49,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 
 import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.common.registry.LanguageRegistry;
 
 /**
  * @author Ordinastie
@@ -61,6 +70,7 @@ public class BlockPack
 	private ZipFile zipFile;
 
 	private HashMap<String, DDBBlock> blocks = new HashMap<>();
+	private HashMap<String, DDBItem> items = new HashMap<>();
 
 	public BlockPack(File file)
 	{
@@ -95,7 +105,7 @@ public class BlockPack
 		}
 		catch (IOException e)
 		{
-			DDB.log.error("Skipping {}, couldn't read {}.json : \n{}", file.getName(), name, e.getMessage());
+			DDB.log.error("Skipping {}, couldn't read {}.json : {}", file.getName(), name, e.getMessage());
 			return;
 		}
 
@@ -113,7 +123,9 @@ public class BlockPack
 			return;
 		}
 
-		registerPack(this);
+		readLangFiles();
+
+		registerPack();
 	}
 
 	/**
@@ -158,9 +170,14 @@ public class BlockPack
 		if (type == Type.FOLDER)
 			return FileUtils.openInputStream(new File(getDirectory() + path));
 		else if (type == Type.ZIP && zipFile != null)
-			return zipFile.getInputStream(zipFile.getEntry(path));
+		{
+			ZipEntry entry = zipFile.getEntry(path);
+			if (entry == null)
+				throw new IOException("File not found : " + path);
+			return zipFile.getInputStream(entry);
+		}
 
-		throw new IOException();
+		throw new IOException("Undetermined pack type : " + type);
 	}
 
 	/**
@@ -175,14 +192,99 @@ public class BlockPack
 	}
 
 	/**
-	 * Adds the <i>block</i> in this <code>BlockPack</code>
+	 * Gets the <code>DDBItem</code> with the specified <i>name</i>
+	 * 
+	 * @param name
+	 * @return
+	 */
+	public DDBItem getItem(String name)
+	{
+		return items.get(name);
+	}
+
+	/**
+	 * Adds the <i>block</i> in this <code>BlockPack</code>.
 	 * 
 	 * @param block
 	 */
 	public void addBlock(DDBBlock block)
 	{
-
 		blocks.put(block.getName(), block);
+	}
+
+	/**
+	 * Adds the <i>item</i> in this <code>BlockPack</code>.
+	 * 
+	 * @param item
+	 */
+	public void addItem(DDBItem item)
+	{
+		items.put(item.getName(), item);
+	}
+
+	private HashMap<String, String> listLangFiles()
+	{
+		HashMap<String, String> list = new HashMap<>();
+
+		if (type == Type.FOLDER)
+		{
+			String path = "lang/";
+			File dir = new File(getDirectory() + path);
+			for (File file : dir.listFiles())
+			{
+				String name = file.getName();
+				list.put(name.substring(0, name.length() - 5), path + name);
+			}
+		}
+		else
+		{
+			Pattern langPattern = Pattern.compile("lang/(.*)\\.lang");
+			Enumeration<? extends ZipEntry> entries = zipFile.entries();
+			while (entries.hasMoreElements())
+			{
+				String name = entries.nextElement().getName();
+				Matcher matcher = langPattern.matcher(name);
+				if (matcher.matches())
+				{
+					list.put(matcher.group(1), name);
+				}
+
+			}
+		}
+
+		return list;
+	}
+
+	private void readLangFiles()
+	{
+		HashMap<String, String> files = listLangFiles();
+		for (Entry<String, String> entry : files.entrySet())
+		{
+			String lang = entry.getKey();
+			String file = entry.getValue();
+
+			try
+			{
+				LanguageRegistry.instance().injectLanguage(lang, StringTranslate.parseLangFile(getInputStream(file)));
+			}
+			catch (IOException e)
+			{
+				DDB.log.error("Failed to read lang file {} : \n{}", name, e.getMessage());
+			}
+		}
+	}
+
+	/**
+	 * Registers the pack if not already present in registry
+	 * 
+	 * @param pack
+	 */
+	public void registerPack()
+	{
+		if (packs.get(name) == null)
+			packs.put(name, this);
+		else
+			DDB.log.error("A DDB pack is already registered with name {}", name);
 	}
 
 	/**
@@ -192,10 +294,7 @@ public class BlockPack
 	{
 		for (DDBBlock block : blocks.values())
 		{
-			if (block.getBlockType() == BlockType.COLORED)
-				GameRegistry.registerBlock(block, DDBItemColored.class, block.getName());
-			else
-				GameRegistry.registerBlock(block, block.getName());
+			GameRegistry.registerBlock(block, block.getItemClass(), block.getName());
 		}
 	}
 
@@ -211,27 +310,13 @@ public class BlockPack
 	}
 
 	/**
-	 * Registers the pack if not already present in registry
+	 * Gets the list of registered <code>BlockPack</code>.
 	 * 
-	 * @param pack
+	 * @return
 	 */
-	public static void registerPack(BlockPack pack)
+	public static Collection<BlockPack> getListPacks()
 	{
-		String name = pack.getName();
-
-		if (packs.get(name) == null)
-			packs.put(pack.getName(), pack);
-		else
-			DDB.log.error("A DDB pack is already registered with name {}", name);
-	}
-
-	/**
-	 * Registers every blocks of every packs
-	 */
-	public static void registerAllBlocks()
-	{
-		for (BlockPack pack : packs.values())
-			pack.registerBlocks();
+		return packs.values();
 	}
 
 	/**
@@ -259,5 +344,21 @@ public class BlockPack
 		if (pack == null)
 			return null;
 		return pack.getBlock(blockName);
+	}
+
+	/**
+	 * Gets a <code>DDBItem</code> from the <i>packName</i> <code>BlockPack</code> with the specified <i>itemName</i>
+	 * 
+	 * @param packName
+	 * @param itemName
+	 * @return the <code>DDBItem</code> if found or <b>null</b> if the <i>packName</i> doesn't match any pack registered or if the
+	 *         <i>itemName</i> doesn't match any item registered for that pack
+	 */
+	public static DDBItem getItem(String packName, String itemName)
+	{
+		BlockPack pack = getPack(packName);
+		if (pack == null)
+			return null;
+		return pack.getItem(itemName);
 	}
 }
