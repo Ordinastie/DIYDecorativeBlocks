@@ -106,6 +106,7 @@ public class BlockDescriptor
 	public String soundType;
 	public boolean useColorMultiplier = false;
 	public boolean opaque = true;
+	public boolean translucent = false;
 
 	public DDBBlock createBlock(BlockPack pack)
 	{

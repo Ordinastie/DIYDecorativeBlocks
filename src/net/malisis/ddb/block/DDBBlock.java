@@ -57,7 +57,7 @@ public class DDBBlock extends Block
 		super(descriptor.getMaterial());
 		this.pack = pack;
 		this.descriptor = descriptor;
-		this.opaque = descriptor.opaque;
+		this.opaque = descriptor.opaque || descriptor.translucent;
 
 		setBlockName(pack.getName() + "_" + descriptor.name);
 		setHardness(descriptor.hardness);
@@ -133,5 +133,11 @@ public class DDBBlock extends Block
 	public boolean isOpaqueCube()
 	{
 		return opaque;
+	}
+
+	@Override
+	public int getRenderBlockPass()
+	{
+		return descriptor.translucent ? 1 : 0;
 	}
 }
