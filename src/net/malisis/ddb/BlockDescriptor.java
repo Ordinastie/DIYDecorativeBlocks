@@ -29,6 +29,7 @@ import java.util.HashMap;
 import net.malisis.ddb.block.DDBBlock;
 import net.malisis.ddb.block.DDBBlockColored;
 import net.malisis.ddb.block.DDBBlockConnected;
+import net.malisis.ddb.block.DDBMegaTexture;
 import net.malisis.ddb.block.DDBSlab;
 import net.malisis.ddb.block.DDBStairs;
 import net.malisis.ddb.item.DDBItem;
@@ -101,12 +102,14 @@ public class BlockDescriptor
 	public String name;
 	public String textureName = name;
 	public LinkedTreeMap<String, String> textures;
+	public LinkedTreeMap<String, String> megatextures;
 	public String material;
 	public float hardness = 2.0F;
 	public String soundType;
 	public boolean useColorMultiplier = false;
 	public boolean opaque = true;
 	public boolean translucent = false;
+	public int numBlocks = -1;
 
 	public DDBBlock createBlock(BlockPack pack)
 	{
@@ -123,9 +126,10 @@ public class BlockDescriptor
 				return new DDBStairs(pack, this);
 			case SLAB:
 				return new DDBSlab(pack, this);
-			default:
-				return null;
+			case MEGATEXTURE:
+				return new DDBMegaTexture(pack, this);
 		}
+		return null;
 	}
 
 	public DDBItem createItem(DDBBlock block)

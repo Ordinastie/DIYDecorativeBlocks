@@ -45,6 +45,8 @@ public enum BlockType
 	STAIRS,
 	@SerializedName("slab")
 	SLAB,
+	@SerializedName("megaTexture")
+	MEGATEXTURE,
 	//@formatter:on
 
 }

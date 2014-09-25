@@ -24,8 +24,8 @@
 
 package net.malisis.ddb.block;
 
-import net.malisis.core.renderer.icon.ConnectedTextureIcon;
 import net.malisis.core.renderer.icon.MalisisIcon;
+import net.malisis.core.renderer.icon.MegaTexture;
 import net.malisis.ddb.BlockDescriptor;
 import net.malisis.ddb.BlockPack;
 import net.malisis.ddb.DDBIcon;
@@ -33,18 +33,14 @@ import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
-import net.minecraftforge.common.util.ForgeDirection;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 /**
  * @author Ordinastie
  * 
  */
-public class DDBBlockConnected extends DDBBlock
+public class DDBMegaTexture extends DDBBlock
 {
-
-	public DDBBlockConnected(BlockPack pack, BlockDescriptor descriptor)
+	public DDBMegaTexture(BlockPack pack, BlockDescriptor descriptor)
 	{
 		super(pack, descriptor);
 	}
@@ -52,41 +48,14 @@ public class DDBBlockConnected extends DDBBlock
 	@Override
 	public void registerBlockIcons(IIconRegister register)
 	{
-		MalisisIcon part1 = new DDBIcon(getName(), pack, descriptor.getTexture()).register((TextureMap) register);
-		MalisisIcon part2 = new DDBIcon(getName() + "2", pack, descriptor.getTexture() + "2").register((TextureMap) register);
-
-		blockIcon = new ConnectedTextureIcon(getName(), part1, part2);
-	}
-
-	@Override
-	public IIcon getIcon(int p_149691_1_, int p_149691_2_)
-	{
-		return ((ConnectedTextureIcon) blockIcon).getFullIcon();
+		MalisisIcon icon = new DDBIcon(getName(), pack, descriptor.getTexture()).register((TextureMap) register);
+		blockIcon = new MegaTexture(icon, descriptor.numBlocks);
 	}
 
 	@Override
 	public IIcon getIcon(IBlockAccess world, int x, int y, int z, int side)
 	{
-		return ((ConnectedTextureIcon) blockIcon).getIcon(world, x, y, z, side);
-	}
-
-	@Override
-	public boolean isOpaqueCube()
-	{
-		return false;
-	}
-
-	/**
-	 * Returns true if the given side of this block type should be rendered, if the adjacent block is at the given coordinates. Args:
-	 * blockAccess, x, y, z, side
-	 */
-	@Override
-	@SideOnly(Side.CLIENT)
-	public boolean shouldSideBeRendered(IBlockAccess world, int x, int y, int z, int side)
-	{
-		ForgeDirection dir = ForgeDirection.getOrientation(side);
-
-		return world.getBlock(x, y, z) != world.getBlock(x - dir.offsetX, y - dir.offsetY, z - dir.offsetZ);
+		return ((MegaTexture) blockIcon).getIcon(world, this, x, y, z, side);
 	}
 
 }

@@ -29,7 +29,7 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import net.malisis.core.renderer.MalisisIcon;
+import net.malisis.core.renderer.icon.MalisisIcon;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
@@ -80,11 +80,5 @@ public class DDBIcon extends MalisisIcon
 			DDB.log.error("Using missing texture, unable to load " + getIconName(), e.getMessage());
 			return true;
 		}
-	}
-
-	@Override
-	public void initSprite(int width, int height, int x, int y, boolean rotated)
-	{
-		super.initSprite(width, height, x, y, rotated);
 	}
 }

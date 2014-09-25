@@ -85,21 +85,22 @@ public class DDBBlock extends Block
 	public void registerBlockIcons(IIconRegister register)
 	{
 		icons = new DDBIcon[6];
-
-		DDBIcon icon = new DDBIcon(getName(), pack, descriptor.getTexture());
-		icon.register((TextureMap) register);
-		blockIcon = icon;
+		boolean registerBlockIcon = false;
 
 		for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS)
 		{
 			String textureName = descriptor.getTexture(dir);
 			if (textureName != null)
 			{
-				icon = new DDBIcon(getName() + "_" + dir.toString(), pack, textureName);
-				icon.register((TextureMap) register);
-				icons[dir.ordinal()] = icon;
+				icons[dir.ordinal()] = (DDBIcon) new DDBIcon(getName() + "_" + dir.toString(), pack, textureName)
+						.register((TextureMap) register);
 			}
+			else
+				registerBlockIcon = true;
 		}
+
+		if (registerBlockIcon)
+			blockIcon = new DDBIcon(getName(), pack, descriptor.getTexture()).register((TextureMap) register);
 	}
 
 	@Override
@@ -113,7 +114,7 @@ public class DDBBlock extends Block
 			else
 				icon = side == metadata + 2 ? icons[ForgeDirection.SOUTH.ordinal()] : icons[ForgeDirection.EAST.ordinal()];
 		}
-		else
+		else if (icons != null)
 			icon = icons[side];
 
 		return icon != null ? icon : blockIcon;
