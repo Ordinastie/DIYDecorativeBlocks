@@ -17,10 +17,25 @@ buildscript {
 
 apply plugin: 'forge'
 
-version = "1.0"
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+version = "1.7.10-1.0"
 group= "net.malisis.ddb" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "DIYDecorativeBlocks"
 libsDirName = "../releases"
+
+sourceSets {
+    main {
+        java { srcDirs = ["$projectDir/src"] }
+        resources { srcDirs = ["$projectDir/resources"] }
+    }
+}
+
+dependencies
+{
+	compile files("../MalisisCore/releases/malisiscore-1.7.10-0.9.5-dev.jar")
+}
+
 
 // because the normal output has been made to be obfuscated
 task deobfJar(type: Jar) {
@@ -50,7 +65,7 @@ minecraft {
 }
 
 dependencies {
-	compile files("../MalisisCore/releases/malisiscore-1.7.2-0.9.1-dev.jar")
+	compile files("../MalisisCore/releases/malisiscore-1.7.2-0.9.5-dev.jar")
 }
 
 processResources
