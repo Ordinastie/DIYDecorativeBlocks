@@ -304,6 +304,8 @@ public class BlockPack
 	public static void readPackFolder()
 	{
 		File packDir = new File("./" + PACKDIR);
+		if (!packDir.exists())
+			packDir.mkdir();
 
 		for (File file : packDir.listFiles())
 			new BlockPack(file);
