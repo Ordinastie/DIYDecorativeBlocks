@@ -25,21 +25,38 @@
 package net.malisis.ddb;
 
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 import javax.imageio.ImageIO;
 
 import net.malisis.core.renderer.icon.MalisisIcon;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IResourceManager;
+import net.minecraft.client.resources.data.AnimationMetadataSection;
+import net.minecraft.client.resources.data.AnimationMetadataSectionSerializer;
+import net.minecraft.client.resources.data.IMetadataSerializer;
 import net.minecraft.util.ResourceLocation;
+
+import org.apache.commons.io.IOUtils;
+
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 /**
  * @author Ordinastie
- * 
+ *
  */
 public class DDBIcon extends MalisisIcon
 {
+	private final static IMetadataSerializer serializer = new IMetadataSerializer();
+	static
+	{
+		serializer.registerMetadataSectionType(new AnimationMetadataSectionSerializer(), AnimationMetadataSection.class);
+	}
+
 	private String path;
 	private BlockPack pack;
 
@@ -65,20 +82,54 @@ public class DDBIcon extends MalisisIcon
 
 		try
 		{
+			InputStream stream = pack.getInputStream(path + ".png");
+			if (stream == null)
+			{
+				DDB.log.error("Using missing texture, file not found : " + getIconName());
+				return true;
+			}
+
 			BufferedImage[] textures = new BufferedImage[1 + mipmapLevels];
-			textures[0] = ImageIO.read(pack.getInputStream(path + ".png"));
-			loadSprite(textures, null, anisotropic);
+			textures[0] = ImageIO.read(stream);
+
+			AnimationMetadataSection animMetadata = readAnimation();
+
+			loadSprite(textures, animMetadata, anisotropic);
 			return false;
-		}
-		catch (RuntimeException e)
-		{
-			DDB.log.error("Unable to parse metadata from " + getIconName(), e.getMessage());
-			return true;
 		}
 		catch (IOException e)
 		{
 			DDB.log.error("Using missing texture, unable to load " + getIconName(), e.getMessage());
 			return true;
+		}
+	}
+
+	/**
+	 * Reads the .mcmeta file for this {@link DDBIcon}.
+	 * 
+	 * @return
+	 */
+	private AnimationMetadataSection readAnimation()
+	{
+		BufferedReader bufferedreader = null;
+		try
+		{
+			InputStream stream = pack.getInputStream(path + ".png.mcmeta");
+			if (stream == null)
+				return null;
+			bufferedreader = new BufferedReader(new InputStreamReader(stream));
+			JsonObject json = (new JsonParser()).parse(bufferedreader).getAsJsonObject();
+
+			AnimationMetadataSection animMetadata = (AnimationMetadataSection) serializer.parseMetadataSection("animation", json);
+			return animMetadata;
+		}
+		catch (IOException e)
+		{
+			return null;
+		}
+		finally
+		{
+			IOUtils.closeQuietly(bufferedreader);
 		}
 	}
 }

@@ -25,7 +25,7 @@
 package net.malisis.ddb.block;
 
 import net.malisis.core.renderer.icon.MalisisIcon;
-import net.malisis.core.renderer.icon.MegaTexture;
+import net.malisis.core.renderer.icon.MegaTextureIcon;
 import net.malisis.ddb.BlockDescriptor;
 import net.malisis.ddb.BlockPack;
 import net.malisis.ddb.DDBIcon;
@@ -49,13 +49,13 @@ public class DDBMegaTexture extends DDBBlock
 	public void registerBlockIcons(IIconRegister register)
 	{
 		MalisisIcon icon = new DDBIcon(getName(), pack, descriptor.getTexture()).register((TextureMap) register);
-		blockIcon = new MegaTexture(icon, descriptor.numBlocks);
+		blockIcon = new MegaTextureIcon(icon, descriptor.numBlocks);
 	}
 
 	@Override
 	public IIcon getIcon(IBlockAccess world, int x, int y, int z, int side)
 	{
-		return ((MegaTexture) blockIcon).getIcon(world, this, x, y, z, side);
+		return ((MegaTextureIcon) blockIcon).getIcon(world, this, x, y, z, side);
 	}
 
 }

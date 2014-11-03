@@ -28,30 +28,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.malisis.core.renderer.BaseRenderer;
-import net.malisis.core.renderer.RenderParameters;
-import net.malisis.core.renderer.preset.ShapePreset;
 import net.malisis.ddb.block.DDBStairs;
 import net.minecraft.util.AxisAlignedBB;
 
 /**
  * @author Ordinastie
- * 
+ *
  */
 public class StairsRenderer extends BaseRenderer
 {
 	@Override
-	protected void initParameters()
+	protected void initialize()
 	{
-		rp = new RenderParameters();
 		rp.useBlockBounds.set(false);
 		rp.renderAllFaces.set(true);
 		rp.interpolateUV.set(true);
-	}
-
-	@Override
-	protected void initShapes()
-	{
-		shape = ShapePreset.Cube();
 	}
 
 	@Override
