@@ -53,7 +53,7 @@ import cpw.mods.fml.common.registry.LanguageRegistry;
 
 /**
  * @author Ordinastie
- * 
+ *
  */
 public class BlockPack
 {
@@ -130,7 +130,7 @@ public class BlockPack
 
 	/**
 	 * Gets the name of this <code>BlockPack</code>.
-	 * 
+	 *
 	 * @return
 	 */
 	public String getName()
@@ -140,7 +140,7 @@ public class BlockPack
 
 	/**
 	 * Gets the type of this <code>BlockPack</code>
-	 * 
+	 *
 	 * @return
 	 */
 	public Type getType()
@@ -150,7 +150,7 @@ public class BlockPack
 
 	/**
 	 * Gets the working directory of this <code>BlockPack</code>.
-	 * 
+	 *
 	 * @return
 	 */
 	public String getDirectory()
@@ -160,7 +160,7 @@ public class BlockPack
 
 	/**
 	 * Gets an inputStream from this <code>BlockPack</code> for the <i>path</i>.
-	 * 
+	 *
 	 * @param path
 	 * @return
 	 * @throws IOException
@@ -168,12 +168,17 @@ public class BlockPack
 	public InputStream getInputStream(String path) throws IOException
 	{
 		if (type == Type.FOLDER)
-			return FileUtils.openInputStream(new File(getDirectory() + path));
+		{
+			File file = new File(getDirectory() + path);
+			if (!file.isFile())
+				return null;
+			return FileUtils.openInputStream(file);
+		}
 		else if (type == Type.ZIP && zipFile != null)
 		{
 			ZipEntry entry = zipFile.getEntry(path);
 			if (entry == null)
-				throw new IOException("File not found : " + path);
+				return null;
 			return zipFile.getInputStream(entry);
 		}
 
@@ -182,7 +187,7 @@ public class BlockPack
 
 	/**
 	 * Gets the <code>DDBBlock</code> with the specified <i>name</i>
-	 * 
+	 *
 	 * @param name
 	 * @return
 	 */
@@ -193,7 +198,7 @@ public class BlockPack
 
 	/**
 	 * Gets the <code>DDBItem</code> with the specified <i>name</i>
-	 * 
+	 *
 	 * @param name
 	 * @return
 	 */
@@ -204,7 +209,7 @@ public class BlockPack
 
 	/**
 	 * Adds the <i>block</i> in this <code>BlockPack</code>.
-	 * 
+	 *
 	 * @param block
 	 */
 	public void addBlock(DDBBlock block)
@@ -214,7 +219,7 @@ public class BlockPack
 
 	/**
 	 * Adds the <i>item</i> in this <code>BlockPack</code>.
-	 * 
+	 *
 	 * @param item
 	 */
 	public void addItem(DDBItem item)
@@ -276,7 +281,7 @@ public class BlockPack
 
 	/**
 	 * Registers the pack if not already present in registry
-	 * 
+	 *
 	 * @param pack
 	 */
 	public void registerPack()
@@ -313,7 +318,7 @@ public class BlockPack
 
 	/**
 	 * Gets the list of registered <code>BlockPack</code>.
-	 * 
+	 *
 	 * @return
 	 */
 	public static Collection<BlockPack> getListPacks()
@@ -323,7 +328,7 @@ public class BlockPack
 
 	/**
 	 * Gets a <code>BlockPack</code> with the specified name
-	 * 
+	 *
 	 * @param name
 	 * @return the <code>DDBPack</code> if found or <b>null</b> if <i>packName</i> doesn't match any pack registered
 	 */
@@ -334,7 +339,7 @@ public class BlockPack
 
 	/**
 	 * Gets a <code>DDBBlock</code> from the <i>packName</i> <code>BlockPack</code> with the specified <i>blocName</i>
-	 * 
+	 *
 	 * @param packName
 	 * @param blockName
 	 * @return the <code>DDBBlock</code> if found or <b>null</b> if the <i>packName</i> doesn't match any pack registered or if the
@@ -350,7 +355,7 @@ public class BlockPack
 
 	/**
 	 * Gets a <code>DDBItem</code> from the <i>packName</i> <code>BlockPack</code> with the specified <i>itemName</i>
-	 * 
+	 *
 	 * @param packName
 	 * @param itemName
 	 * @return the <code>DDBItem</code> if found or <b>null</b> if the <i>packName</i> doesn't match any pack registered or if the
