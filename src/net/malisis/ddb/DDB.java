@@ -34,15 +34,17 @@ import net.minecraft.creativetab.CreativeTabs;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.relauncher.Side;
 
 /**
  * @author Ordinastie
- * 
+ *
  */
 @Mod(modid = DDB.modid, name = DDB.modname, version = DDB.version)
 public class DDB implements IMalisisMod
@@ -98,6 +100,7 @@ public class DDB implements IMalisisMod
 	@EventHandler
 	public void init(FMLInitializationEvent event)
 	{
-		new StairsRenderer().registerFor(DDBStairs.class);
+		if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
+			new StairsRenderer().registerFor(DDBStairs.class);
 	}
 }
