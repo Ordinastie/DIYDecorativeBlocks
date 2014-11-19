@@ -42,7 +42,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 
 /**
  * @author Ordinastie
- * 
+ *
  */
 public class DDBBlock extends Block
 {
@@ -57,7 +57,7 @@ public class DDBBlock extends Block
 		super(descriptor.getMaterial());
 		this.pack = pack;
 		this.descriptor = descriptor;
-		this.opaque = descriptor.opaque || descriptor.translucent;
+		this.opaque = descriptor.opaque && !descriptor.translucent;
 
 		setBlockName(pack.getName() + "_" + descriptor.name);
 		setHardness(descriptor.hardness);

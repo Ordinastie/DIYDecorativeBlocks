@@ -39,7 +39,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 
 /**
  * @author Ordinastie
- * 
+ *
  */
 public class DDBBlockConnected extends DDBBlock
 {
@@ -68,12 +68,6 @@ public class DDBBlockConnected extends DDBBlock
 	public IIcon getIcon(IBlockAccess world, int x, int y, int z, int side)
 	{
 		return ((ConnectedTextureIcon) blockIcon).getIcon(world, x, y, z, side);
-	}
-
-	@Override
-	public boolean isOpaqueCube()
-	{
-		return false;
 	}
 
 	/**
