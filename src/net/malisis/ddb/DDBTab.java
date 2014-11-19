@@ -30,13 +30,13 @@ import net.minecraft.item.Item;
 
 /**
  * @author Ordinastie
- * 
+ *
  */
 public class DDBTab extends CreativeTabs
 {
 	public DDBTab()
 	{
-		super(DDB.modname);
+		super(DDB.modid);
 	}
 
 	@Override
