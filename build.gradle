@@ -19,7 +19,7 @@ apply plugin: 'forge'
 
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
-version = "1.7.10-1.1"
+version = "1.7.10-1.2"
 group= "net.malisis.ddb" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "DIYDecorativeBlocks"
 libsDirName = "../releases"
@@ -33,7 +33,7 @@ sourceSets {
 
 dependencies
 {
-	compile files("../MalisisCore/releases/malisiscore-1.7.10-0.9.6-dev.jar")
+	compile 'net.malisis:malisiscore:1.7.10-0.10.2:dev'	
 }
 
 
@@ -50,7 +50,7 @@ artifacts {
 }
 
 minecraft {
-    version = "1.7.10-10.13.0.1208"
+    version = "1.7.10-10.13.2.1232"
   	if(file("../../run").exists())
 	{
 		runDir = "../../run/assets"
@@ -62,10 +62,6 @@ minecraft {
 	
 	replace '${version}', project.version
     replaceIn "DDB.java"
-}
-
-dependencies {
-	compile files("../MalisisCore/releases/malisiscore-1.7.2-0.9.5-dev.jar")
 }
 
 processResources
