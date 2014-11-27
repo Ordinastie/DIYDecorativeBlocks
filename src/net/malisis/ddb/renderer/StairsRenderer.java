@@ -27,7 +27,8 @@ package net.malisis.ddb.renderer;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.malisis.core.renderer.BaseRenderer;
+import net.malisis.core.renderer.MalisisRenderer;
+import net.malisis.core.renderer.RenderType;
 import net.malisis.ddb.block.DDBStairs;
 import net.minecraft.util.AxisAlignedBB;
 
@@ -35,7 +36,7 @@ import net.minecraft.util.AxisAlignedBB;
  * @author Ordinastie
  *
  */
-public class StairsRenderer extends BaseRenderer
+public class StairsRenderer extends MalisisRenderer
 {
 	@Override
 	protected void initialize()
@@ -51,7 +52,7 @@ public class StairsRenderer extends BaseRenderer
 		rp.useBlockBounds.set(false);
 
 		List<AxisAlignedBB> list = null;
-		if (renderType == TYPE_ISBRH_WORLD)
+		if (renderType == RenderType.ISBRH_WORLD)
 			list = ((DDBStairs) block).getBounds(world, x, y, z);
 		else
 		{
