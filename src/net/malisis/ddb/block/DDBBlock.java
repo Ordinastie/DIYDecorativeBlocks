@@ -36,6 +36,7 @@ import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -140,5 +141,12 @@ public class DDBBlock extends Block
 	public int getRenderBlockPass()
 	{
 		return descriptor.translucent ? 1 : 0;
+	}
+
+	public IRecipe getRecipe()
+	{
+		if (descriptor.recipe == null)
+			return null;
+		return descriptor.recipe.createRecipe(this);
 	}
 }

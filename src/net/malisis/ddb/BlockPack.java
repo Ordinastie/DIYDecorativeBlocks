@@ -27,9 +27,6 @@ package net.malisis.ddb;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map.Entry;
@@ -40,13 +37,10 @@ import java.util.zip.ZipFile;
 
 import net.malisis.ddb.block.DDBBlock;
 import net.malisis.ddb.item.DDBItem;
+import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.StringTranslate;
 
 import org.apache.commons.io.FileUtils;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonSyntaxException;
 
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
@@ -62,9 +56,6 @@ public class BlockPack
 		FOLDER, ZIP
 	};
 
-	public static String PACKDIR = "ddbpacks";
-	public static HashMap<String, BlockPack> packs = new HashMap<>();
-
 	private Type type;
 	private String name;
 	private ZipFile zipFile;
@@ -72,64 +63,17 @@ public class BlockPack
 	private HashMap<String, DDBBlock> blocks = new HashMap<>();
 	private HashMap<String, DDBItem> items = new HashMap<>();
 
-	public BlockPack(File file)
+	public BlockPack(Type type, String name, ZipFile zipFile)
 	{
-		if (file.isDirectory())
-		{
-			this.name = file.getName();
-			this.type = Type.FOLDER;
-		}
-		else if (file.getName().endsWith(".zip"))
-		{
-			this.name = file.getName().substring(0, file.getName().length() - 4);
-			this.type = Type.ZIP;
-			try
-			{
-				this.zipFile = new ZipFile(file);
-			}
-			catch (IOException e)
-			{
-				DDB.log.error("Could not read zip file {} : \n{}", file.getName(), e.getMessage());
-			}
-		}
-		else
-		{
-			DDB.log.error("Skipping {}, not a valid DDB pack file.", file.getName());
-			return;
-		}
-
-		InputStream inputStream;
-		try
-		{
-			inputStream = getInputStream(name + ".json");
-		}
-		catch (IOException e)
-		{
-			DDB.log.error("Skipping {}, couldn't read {}.json : {}", file.getName(), name, e.getMessage());
-			return;
-		}
-
-		GsonBuilder gsonBuilder = new GsonBuilder();
-		gsonBuilder.registerTypeAdapter(BlockPack.class, new BlockPackDeserializer(this));
-		Gson gson = gsonBuilder.create();
-
-		try (Reader reader = new InputStreamReader(inputStream, "UTF-8"))
-		{
-			gson.fromJson(reader, BlockPack.class);
-		}
-		catch (IOException | JsonSyntaxException e)
-		{
-			DDB.log.error("Failed to read {}.json : \n{}", name, e.getMessage());
-			return;
-		}
+		this.type = type;
+		this.name = name;
+		this.zipFile = zipFile;
 
 		readLangFiles();
-
-		registerPack();
 	}
 
 	/**
-	 * Gets the name of this <code>BlockPack</code>.
+	 * Gets the name of this {@link BlockPack}.
 	 *
 	 * @return
 	 */
@@ -139,7 +83,7 @@ public class BlockPack
 	}
 
 	/**
-	 * Gets the type of this <code>BlockPack</code>
+	 * Gets the type of this {@link BlockPack}
 	 *
 	 * @return
 	 */
@@ -149,17 +93,17 @@ public class BlockPack
 	}
 
 	/**
-	 * Gets the working directory of this <code>BlockPack</code>.
+	 * Gets the working directory of this {@link BlockPack}.
 	 *
 	 * @return
 	 */
 	public String getDirectory()
 	{
-		return "./" + PACKDIR + "/" + name + "/";
+		return "./" + DDB.PACKDIR + "/" + name + "/";
 	}
 
 	/**
-	 * Gets an inputStream from this <code>BlockPack</code> for the <i>path</i>.
+	 * Gets an inputStream from this {@link BlockPack} for the <i>path</i>.
 	 *
 	 * @param path
 	 * @return
@@ -186,7 +130,7 @@ public class BlockPack
 	}
 
 	/**
-	 * Gets the <code>DDBBlock</code> with the specified <i>name</i>
+	 * Gets the {@link DDBBlock} with the specified <i>name</i>.
 	 *
 	 * @param name
 	 * @return
@@ -197,7 +141,7 @@ public class BlockPack
 	}
 
 	/**
-	 * Gets the <code>DDBItem</code> with the specified <i>name</i>
+	 * Gets the {@link DDBItem} with the specified <i>name</i>.
 	 *
 	 * @param name
 	 * @return
@@ -208,7 +152,7 @@ public class BlockPack
 	}
 
 	/**
-	 * Adds the <i>block</i> in this <code>BlockPack</code>.
+	 * Adds the <i>block</i> in this {@link BlockPack}.
 	 *
 	 * @param block
 	 */
@@ -218,7 +162,7 @@ public class BlockPack
 	}
 
 	/**
-	 * Adds the <i>item</i> in this <code>BlockPack</code>.
+	 * Adds the <i>item</i> in this {@link BlockPack}.
 	 *
 	 * @param item
 	 */
@@ -227,6 +171,11 @@ public class BlockPack
 		items.put(item.getName(), item);
 	}
 
+	/**
+	 * List all lang files inside this {@link BlockPack}.
+	 *
+	 * @return the hash map
+	 */
 	private HashMap<String, String> listLangFiles()
 	{
 		HashMap<String, String> list = new HashMap<>();
@@ -260,6 +209,9 @@ public class BlockPack
 		return list;
 	}
 
+	/**
+	 * Read and load all lang files in this {@link BlockPack}.
+	 */
 	private void readLangFiles()
 	{
 		HashMap<String, String> files = listLangFiles();
@@ -280,20 +232,7 @@ public class BlockPack
 	}
 
 	/**
-	 * Registers the pack if not already present in registry
-	 *
-	 * @param pack
-	 */
-	public void registerPack()
-	{
-		if (packs.get(name) == null)
-			packs.put(name, this);
-		else
-			DDB.log.error("A DDB pack is already registered with name {}", name);
-	}
-
-	/**
-	 * Registers all the block of this <code>BlockPack</code> to the GameRegistry
+	 * Registers all the block of this {@link BlockPack} to the GameRegistry
 	 */
 	public void registerBlocks()
 	{
@@ -303,69 +242,14 @@ public class BlockPack
 		}
 	}
 
-	/**
-	 * Reads the pack folder and creates the packs
-	 */
-	public static void readPackFolder()
+	public void registerRecipes()
 	{
-		File packDir = new File("./" + PACKDIR);
-		if (!packDir.exists())
-			packDir.mkdir();
-
-		for (File file : packDir.listFiles())
-			new BlockPack(file);
+		for (DDBBlock block : blocks.values())
+		{
+			IRecipe recipe = block.getRecipe();
+			if (recipe != null)
+				GameRegistry.addRecipe(recipe);
+		}
 	}
 
-	/**
-	 * Gets the list of registered <code>BlockPack</code>.
-	 *
-	 * @return
-	 */
-	public static Collection<BlockPack> getListPacks()
-	{
-		return packs.values();
-	}
-
-	/**
-	 * Gets a <code>BlockPack</code> with the specified name
-	 *
-	 * @param name
-	 * @return the <code>DDBPack</code> if found or <b>null</b> if <i>packName</i> doesn't match any pack registered
-	 */
-	public static BlockPack getPack(String name)
-	{
-		return packs.get(name);
-	}
-
-	/**
-	 * Gets a <code>DDBBlock</code> from the <i>packName</i> <code>BlockPack</code> with the specified <i>blocName</i>
-	 *
-	 * @param packName
-	 * @param blockName
-	 * @return the <code>DDBBlock</code> if found or <b>null</b> if the <i>packName</i> doesn't match any pack registered or if the
-	 *         <i>blockName</i> doesn't match any block registered for that pack
-	 */
-	public static DDBBlock getBlock(String packName, String blockName)
-	{
-		BlockPack pack = getPack(packName);
-		if (pack == null)
-			return null;
-		return pack.getBlock(blockName);
-	}
-
-	/**
-	 * Gets a <code>DDBItem</code> from the <i>packName</i> <code>BlockPack</code> with the specified <i>itemName</i>
-	 *
-	 * @param packName
-	 * @param itemName
-	 * @return the <code>DDBItem</code> if found or <b>null</b> if the <i>packName</i> doesn't match any pack registered or if the
-	 *         <i>itemName</i> doesn't match any item registered for that pack
-	 */
-	public static DDBItem getItem(String packName, String itemName)
-	{
-		BlockPack pack = getPack(packName);
-		if (pack == null)
-			return null;
-		return pack.getItem(itemName);
-	}
 }

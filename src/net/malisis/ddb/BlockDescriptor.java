@@ -42,7 +42,7 @@ import com.google.gson.internal.LinkedTreeMap;
 
 /**
  * @author Ordinastie
- * 
+ *
  */
 public class BlockDescriptor
 {
@@ -110,6 +110,7 @@ public class BlockDescriptor
 	public boolean opaque = true;
 	public boolean translucent = false;
 	public int numBlocks = -1;
+	public DDBRecipe recipe;
 
 	public DDBBlock createBlock(BlockPack pack)
 	{

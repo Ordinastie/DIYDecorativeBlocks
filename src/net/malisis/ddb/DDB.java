@@ -24,10 +24,17 @@
 
 package net.malisis.ddb;
 
+import java.io.File;
+import java.util.Collection;
+import java.util.HashMap;
+
 import net.malisis.core.IMalisisMod;
 import net.malisis.core.MalisisCore;
 import net.malisis.core.configuration.Settings;
+import net.malisis.ddb.block.DDBBlock;
 import net.malisis.ddb.block.DDBStairs;
+import net.malisis.ddb.item.DDBItem;
+import net.malisis.ddb.json.BlockPackJsonReader;
 import net.malisis.ddb.renderer.StairsRenderer;
 import net.minecraft.creativetab.CreativeTabs;
 
@@ -49,6 +56,9 @@ import cpw.mods.fml.relauncher.Side;
 @Mod(modid = DDB.modid, name = DDB.modname, version = DDB.version)
 public class DDB implements IMalisisMod
 {
+	public static String PACKDIR = "ddbpacks";
+	public static HashMap<String, BlockPack> packs = new HashMap<>();
+
 	public static final String modid = "ddb";
 	public static final String modname = "DIY Decorative Blocks";
 	public static final String version = "${version}";
@@ -63,7 +73,7 @@ public class DDB implements IMalisisMod
 	{
 		instance = this;
 		MalisisCore.registerMod(this);
-		BlockPack.readPackFolder();
+		readPackFolder();
 	}
 
 	@Override
@@ -93,14 +103,100 @@ public class DDB implements IMalisisMod
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event)
 	{
-		for (BlockPack pack : BlockPack.getListPacks())
+		for (BlockPack pack : getListPacks())
 			pack.registerBlocks();
 	}
 
 	@EventHandler
 	public void init(FMLInitializationEvent event)
 	{
+		for (BlockPack pack : getListPacks())
+			pack.registerRecipes();
+
 		if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
 			new StairsRenderer().registerFor(DDBStairs.class);
+	}
+
+	/**
+	 * Reads the pack folder and creates the packs
+	 */
+	public static void readPackFolder()
+	{
+		File packDir = new File("./" + PACKDIR);
+		if (!packDir.exists())
+			packDir.mkdir();
+
+		for (File file : packDir.listFiles())
+		{
+			BlockPack pack = BlockPackJsonReader.readPack(file);
+			if (pack != null)
+				register(pack);
+		}
+	}
+
+	/**
+	 * Gets the list of registered <code>BlockPack</code>.
+	 *
+	 * @return
+	 */
+	public static Collection<BlockPack> getListPacks()
+	{
+		return packs.values();
+	}
+
+	/**
+	 * Registers the pack if not already present in registry
+	 *
+	 * @param pack
+	 */
+	public static void register(BlockPack pack)
+	{
+		if (DDB.packs.get(pack.getName()) == null)
+			DDB.packs.put(pack.getName(), pack);
+		else
+			DDB.log.error("A DDB pack is already registered with name {}", pack.getName());
+	}
+
+	/**
+	 * Gets a <code>BlockPack</code> with the specified name
+	 *
+	 * @param name
+	 * @return the <code>DDBPack</code> if found or <b>null</b> if <i>packName</i> doesn't match any pack registered
+	 */
+	public static BlockPack getPack(String name)
+	{
+		return packs.get(name);
+	}
+
+	/**
+	 * Gets a <code>DDBBlock</code> from the <i>packName</i> <code>BlockPack</code> with the specified <i>blocName</i>
+	 *
+	 * @param packName
+	 * @param blockName
+	 * @return the <code>DDBBlock</code> if found or <b>null</b> if the <i>packName</i> doesn't match any pack registered or if the
+	 *         <i>blockName</i> doesn't match any block registered for that pack
+	 */
+	public static DDBBlock getBlock(String packName, String blockName)
+	{
+		BlockPack pack = getPack(packName);
+		if (pack == null)
+			return null;
+		return pack.getBlock(blockName);
+	}
+
+	/**
+	 * Gets a <code>DDBItem</code> from the <i>packName</i> <code>BlockPack</code> with the specified <i>itemName</i>
+	 *
+	 * @param packName
+	 * @param itemName
+	 * @return the <code>DDBItem</code> if found or <b>null</b> if the <i>packName</i> doesn't match any pack registered or if the
+	 *         <i>itemName</i> doesn't match any item registered for that pack
+	 */
+	public static DDBItem getItem(String packName, String itemName)
+	{
+		BlockPack pack = getPack(packName);
+		if (pack == null)
+			return null;
+		return pack.getItem(itemName);
 	}
 }
