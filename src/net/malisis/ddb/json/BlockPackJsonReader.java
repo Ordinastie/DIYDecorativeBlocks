@@ -76,7 +76,7 @@ public class BlockPackJsonReader
 			}
 			catch (IOException e)
 			{
-				DDB.log.error("Could not read zip file {} : \n{}", file.getName(), e.getMessage());
+				DDB.log.error("Could not read zip file {} :\n", file.getName(), e);
 			}
 		}
 		else
