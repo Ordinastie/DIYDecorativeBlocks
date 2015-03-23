@@ -37,7 +37,7 @@ import net.minecraft.world.World;
 
 /**
  * @author Ordinastie
- * 
+ *
  */
 public class DDBSlab extends DDBBlock
 {
@@ -47,7 +47,7 @@ public class DDBSlab extends DDBBlock
 	public DDBSlab(BlockPack pack, BlockDescriptor descriptor)
 	{
 		super(pack, descriptor);
-		opaque = false;
+		fullBlock = false;
 		setBlockBounds(0, 0, 0, 1, 0.5F, 1);
 	}
 

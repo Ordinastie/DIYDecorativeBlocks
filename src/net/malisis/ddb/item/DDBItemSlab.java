@@ -37,7 +37,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 
 /**
  * @author Ordinastie
- * 
+ *
  */
 public class DDBItemSlab extends DDBItem
 {
@@ -101,7 +101,7 @@ public class DDBItemSlab extends DDBItem
 
 	private void playSound(World world, int x, int y, int z)
 	{
-		world.playSoundEffect(x + 0.5F, y + 0.5F, z + 0.5F, getBlock().stepSound.func_150496_b(),
-				(getBlock().stepSound.getVolume() + 1.0F) / 2.0F, getBlock().stepSound.getPitch() * 0.8F);
+		world.playSoundEffect(x + 0.5F, y + 0.5F, z + 0.5F, getBlock().stepSound.getPlaceSound(),
+				(getBlock().stepSound.getVolume() + 1.0F) / 2.0F, getBlock().stepSound.getFrequency() * 0.8F);
 	}
 }

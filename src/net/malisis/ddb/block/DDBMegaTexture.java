@@ -36,7 +36,7 @@ import net.minecraft.world.IBlockAccess;
 
 /**
  * @author Ordinastie
- * 
+ *
  */
 public class DDBMegaTexture extends DDBBlock
 {
@@ -46,7 +46,7 @@ public class DDBMegaTexture extends DDBBlock
 	}
 
 	@Override
-	public void registerBlockIcons(IIconRegister register)
+	public void registerIcons(IIconRegister register)
 	{
 		MalisisIcon icon = new DDBIcon(getName(), pack, descriptor.getTexture()).register((TextureMap) register);
 		blockIcon = new MegaTextureIcon(icon, descriptor.numBlocks);

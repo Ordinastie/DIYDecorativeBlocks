@@ -46,7 +46,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 
 /**
  * @author Ordinastie
- * 
+ *
  */
 public class DDBBlockColored extends DDBBlock
 {
@@ -78,7 +78,7 @@ public class DDBBlockColored extends DDBBlock
 	@Override
 	public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase player, ItemStack itemStack)
 	{
-		world.setBlockMetadataWithNotify(x, y, z, itemStack.getItemDamage(), 2);
+		world.setBlockMetadataWithNotify(x, y, z, itemStack.getMetadata(), 2);
 	}
 
 	@Override
@@ -99,11 +99,11 @@ public class DDBBlockColored extends DDBBlock
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void registerBlockIcons(IIconRegister register)
+	public void registerIcons(IIconRegister register)
 	{
 		if (descriptor.useColorMultiplier)
 		{
-			super.registerBlockIcons(register);
+			super.registerIcons(register);
 			return;
 		}
 
@@ -111,7 +111,7 @@ public class DDBBlockColored extends DDBBlock
 
 		for (int i = 0; i < this.icons.length; i++)
 		{
-			String color = ItemDye.field_150921_b[~i & 15]; //reverse the order from the array
+			String color = ItemDye.dyeIcons[~i & 15]; //reverse the order from the array
 			String name = getName() + "_" + color;
 			DDBIcon icon = new DDBIcon(name, pack, descriptor.getTexture() + "_" + color);
 			icon.register((TextureMap) register);
@@ -123,7 +123,7 @@ public class DDBBlockColored extends DDBBlock
 	public int getRenderColor(int metadata)
 	{
 		if (descriptor.useColorMultiplier)
-			return ItemDye.field_150922_c[~metadata & 15];
+			return ItemDye.dyeColors[~metadata & 15];
 		else
 			return 0xFFFFFF;
 	}

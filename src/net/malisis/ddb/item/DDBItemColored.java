@@ -33,7 +33,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 
 /**
  * @author Ordinastie
- * 
+ *
  */
 public class DDBItemColored extends DDBItem
 {
@@ -46,13 +46,13 @@ public class DDBItemColored extends DDBItem
 	@Override
 	public String getUnlocalizedName(ItemStack itemStack)
 	{
-		return getUnlocalizedName() + "_" + ItemDye.field_150921_b[~itemStack.getItemDamage() & 15];
+		return getUnlocalizedName() + "_" + ItemDye.dyeColorNames[~itemStack.getMetadata() & 15];
 	}
 
 	@Override
 	@SideOnly(Side.CLIENT)
 	public int getColorFromItemStack(ItemStack itemStack, int pass)
 	{
-		return this.field_150939_a.getBlockColor();
+		return this.blockInstance.getBlockColor();
 	}
 }

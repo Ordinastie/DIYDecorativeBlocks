@@ -58,9 +58,9 @@ public class DDBBlock extends Block
 		super(descriptor.getMaterial());
 		this.pack = pack;
 		this.descriptor = descriptor;
-		this.opaque = descriptor.opaque && !descriptor.translucent;
+		this.fullBlock = descriptor.opaque && !descriptor.translucent;
 
-		setBlockName(pack.getName() + "_" + descriptor.name);
+		setUnlocalizedName(pack.getName() + "_" + descriptor.name);
 		setHardness(descriptor.hardness);
 		setStepSound(descriptor.getSoundType());
 
@@ -83,7 +83,7 @@ public class DDBBlock extends Block
 	}
 
 	@Override
-	public void registerBlockIcons(IIconRegister register)
+	public void registerIcons(IIconRegister register)
 	{
 		icons = new DDBIcon[6];
 		boolean registerBlockIcon = false;
@@ -134,7 +134,7 @@ public class DDBBlock extends Block
 	@Override
 	public boolean isOpaqueCube()
 	{
-		return opaque;
+		return fullBlock;
 	}
 
 	@Override

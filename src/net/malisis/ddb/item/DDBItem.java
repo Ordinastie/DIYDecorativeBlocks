@@ -29,7 +29,7 @@ import net.minecraft.item.ItemBlock;
 
 /**
  * @author Ordinastie
- * 
+ *
  */
 public class DDBItem extends ItemBlock
 {
@@ -45,6 +45,6 @@ public class DDBItem extends ItemBlock
 
 	public DDBBlock getBlock()
 	{
-		return (DDBBlock) field_150939_a;
+		return (DDBBlock) blockInstance;
 	}
 }

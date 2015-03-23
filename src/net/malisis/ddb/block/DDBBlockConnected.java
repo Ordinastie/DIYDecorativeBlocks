@@ -50,7 +50,7 @@ public class DDBBlockConnected extends DDBBlock
 	}
 
 	@Override
-	public void registerBlockIcons(IIconRegister register)
+	public void registerIcons(IIconRegister register)
 	{
 		MalisisIcon part1 = new DDBIcon(getName(), pack, descriptor.getTexture()).register((TextureMap) register);
 		MalisisIcon part2 = new DDBIcon(getName() + "2", pack, descriptor.getTexture() + "2").register((TextureMap) register);
