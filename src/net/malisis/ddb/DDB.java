@@ -53,7 +53,7 @@ import cpw.mods.fml.relauncher.Side;
  * @author Ordinastie
  *
  */
-@Mod(modid = DDB.modid, name = DDB.modname, version = DDB.version)
+@Mod(modid = DDB.modid, name = DDB.modname, version = DDB.version, dependencies = "required-after:malisiscore")
 public class DDB implements IMalisisMod
 {
 	public static String PACKDIR = "ddbpacks";
