@@ -109,6 +109,7 @@ public class BlockDescriptor
 	public boolean useColorMultiplier = false;
 	public boolean opaque = true;
 	public boolean translucent = false;
+	public int lightValue = 0;
 	public int numBlocks = -1;
 	public DDBRecipe recipe;
 

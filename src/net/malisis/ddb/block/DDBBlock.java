@@ -59,6 +59,8 @@ public class DDBBlock extends Block
 		this.pack = pack;
 		this.descriptor = descriptor;
 		this.fullBlock = descriptor.opaque && !descriptor.translucent;
+		this.lightOpacity = fullBlock ? 255 : 0;
+		this.lightValue = Math.max(0, Math.min(15, descriptor.lightValue));
 
 		setUnlocalizedName(pack.getName() + "_" + descriptor.name);
 		setHardness(descriptor.hardness);
