@@ -184,10 +184,13 @@ public class BlockPack
 		{
 			String path = "lang/";
 			File dir = new File(getDirectory() + path);
-			for (File file : dir.listFiles())
+			if (dir.isDirectory())
 			{
-				String name = file.getName();
-				list.put(name.substring(0, name.length() - 5), path + name);
+				for (File file : dir.listFiles())
+				{
+					String name = file.getName();
+					list.put(name.substring(0, name.length() - 5), path + name);
+				}
 			}
 		}
 		else
