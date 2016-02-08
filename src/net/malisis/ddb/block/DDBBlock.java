@@ -24,34 +24,35 @@
 
 package net.malisis.ddb.block;
 
-import net.malisis.core.util.EntityUtils;
+import net.malisis.core.block.MalisisBlock;
+import net.malisis.core.block.component.ColorComponent;
+import net.malisis.core.block.component.DirectionalComponent;
+import net.malisis.core.block.component.StairComponent;
+import net.malisis.core.renderer.icon.MalisisIcon;
+import net.malisis.core.renderer.icon.provider.ConnectedIconsProvider;
+import net.malisis.core.renderer.icon.provider.MegaTextureIconProvider;
+import net.malisis.core.renderer.icon.provider.PropertyEnumIconProvider;
+import net.malisis.core.renderer.icon.provider.SidesIconProvider;
 import net.malisis.ddb.BlockDescriptor;
 import net.malisis.ddb.BlockPack;
 import net.malisis.ddb.BlockType;
 import net.malisis.ddb.DDB;
 import net.malisis.ddb.DDBIcon;
-import net.minecraft.block.Block;
-import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.client.renderer.texture.TextureMap;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.item.ItemBlock;
-import net.minecraft.item.ItemStack;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.util.IIcon;
-import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumWorldBlockLayer;
+import net.minecraft.world.IBlockAccess;
 
 /**
  * @author Ordinastie
  *
  */
-public class DDBBlock extends Block
+public class DDBBlock extends MalisisBlock
 {
 	protected BlockPack pack;
 	protected BlockDescriptor descriptor;
-	protected DDBIcon[] icons;
-
-	//	private IIcon testIcon;
 
 	public DDBBlock(BlockPack pack, BlockDescriptor descriptor)
 	{
@@ -62,16 +63,31 @@ public class DDBBlock extends Block
 		this.lightOpacity = fullBlock ? 255 : 0;
 		this.lightValue = Math.max(0, Math.min(15, descriptor.lightValue));
 
-		setUnlocalizedName(pack.getName() + "_" + descriptor.name);
+		setName(pack.getName() + "_" + descriptor.name);
 		setHardness(descriptor.hardness);
 		setStepSound(descriptor.getSoundType());
 
 		setCreativeTab(DDB.tab);
+
+		switch (descriptor.type)
+		{
+			case DIRECTIONAL:
+				addComponent(new DirectionalComponent());
+				break;
+			case STAIRS:
+				addComponent(new StairComponent());
+				break;
+			case COLORED:
+				addComponent(new ColorComponent(descriptor.useColorMultiplier));
+				break;
+			default:
+				break;
+		}
 	}
 
 	public String getName()
 	{
-		return getUnlocalizedName().substring(5);
+		return name;
 	}
 
 	public BlockType getBlockType()
@@ -79,58 +95,58 @@ public class DDBBlock extends Block
 		return descriptor.type;
 	}
 
-	public Class getItemClass()
-	{
-		return ItemBlock.class;
-	}
-
 	@Override
-	public void registerIcons(IIconRegister register)
+	public void createIconProvider(Object object)
 	{
-		icons = new DDBIcon[6];
-		boolean registerBlockIcon = false;
+		if (descriptor.type == BlockType.MEGATEXTURE)
+		{
+			DDBIcon defaultIcon = new DDBIcon(getName(), pack, descriptor.getTexture());
+			MegaTextureIconProvider iconProvider = new MegaTextureIconProvider(defaultIcon);
+			for (EnumFacing facing : EnumFacing.VALUES)
+				iconProvider.setMegaTexture(facing, defaultIcon, descriptor.numBlocks);
 
-		for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS)
+			this.iconProvider = iconProvider;
+			return;
+		}
+		else if (descriptor.type == BlockType.CONNECTED)
+		{
+			MalisisIcon part1 = new DDBIcon(getName(), pack, descriptor.getTexture());
+			MalisisIcon part2 = new DDBIcon(getName() + "2", pack, descriptor.getTexture() + "2");
+
+			iconProvider = new ConnectedIconsProvider(part1, part2);
+			return;
+		}
+		if (descriptor.type == BlockType.COLORED && !descriptor.useColorMultiplier)
+		{
+			//DDBIcon defaultIcon = new DDBIcon(name, pack, descriptor.getTexture());
+			PropertyEnumIconProvider<EnumDyeColor> iconProvider = new PropertyEnumIconProvider<>(ColorComponent.COLOR, EnumDyeColor.class);
+			for (EnumDyeColor color : EnumDyeColor.values())
+			{
+				String name = getName() + "_" + color.getUnlocalizedName();
+				DDBIcon icon = new DDBIcon(name, pack, descriptor.getTexture() + "_" + color.getUnlocalizedName());
+				iconProvider.setIcon(color, icon);
+			}
+
+			this.iconProvider = iconProvider;
+			return;
+		}
+
+		MalisisIcon defaultIcon = null;
+		MalisisIcon[] sideIcons = new DDBIcon[6];
+		for (EnumFacing dir : EnumFacing.VALUES)
 		{
 			String textureName = descriptor.getTexture(dir);
+
 			if (textureName != null)
-			{
-				icons[dir.ordinal()] = (DDBIcon) new DDBIcon(getName() + "_" + dir.toString(), pack, textureName)
-						.register((TextureMap) register);
-			}
-			else
-				registerBlockIcon = true;
+				sideIcons[dir.ordinal()] = new DDBIcon(name + "_" + dir.toString(), pack, textureName);
+			else if (defaultIcon == null)
+				defaultIcon = new DDBIcon(name, pack, descriptor.getTexture());
 		}
 
-		if (registerBlockIcon)
-			blockIcon = new DDBIcon(getName(), pack, descriptor.getTexture()).register((TextureMap) register);
-	}
+		//		if (descriptor.type == BlockType.STAIRS)
+		//			defaultIcon = new VanillaIcon(Blocks.planks);
 
-	@Override
-	public IIcon getIcon(int side, int metadata)
-	{
-		IIcon icon = null;
-		if (descriptor.type == BlockType.DIRECTIONAL)
-		{
-			if (side == 0 || side == 1)
-				icon = icons[side];
-			else
-				icon = side == metadata + 2 ? icons[ForgeDirection.SOUTH.ordinal()] : icons[ForgeDirection.EAST.ordinal()];
-		}
-		else if (icons != null)
-			icon = icons[side];
-
-		return icon != null ? icon : blockIcon;
-	}
-
-	@Override
-	public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase player, ItemStack itemStack)
-	{
-		if (descriptor.type != BlockType.DIRECTIONAL)
-			return;
-
-		ForgeDirection dir = EntityUtils.getEntityFacing(player, false);
-		world.setBlockMetadataWithNotify(x, y, z, dir.getOpposite().ordinal() - 2, 3);
+		iconProvider = new SidesIconProvider(defaultIcon, sideIcons);
 	}
 
 	@Override
@@ -140,9 +156,19 @@ public class DDBBlock extends Block
 	}
 
 	@Override
-	public int getRenderBlockPass()
+	public boolean canRenderInLayer(EnumWorldBlockLayer layer)
 	{
-		return descriptor.translucent ? 1 : 0;
+		if (descriptor.translucent)
+			return layer == EnumWorldBlockLayer.TRANSLUCENT;
+		return layer == EnumWorldBlockLayer.CUTOUT_MIPPED;
+	}
+
+	@Override
+	public boolean shouldSideBeRendered(IBlockAccess world, BlockPos pos, EnumFacing side)
+	{
+		if (descriptor.type == BlockType.CONNECTED)
+			return world.getBlockState(pos).getBlock() != world.getBlockState(pos.offset(side.getOpposite()));
+		return super.shouldSideBeRendered(world, pos, side);
 	}
 
 	public IRecipe getRecipe()

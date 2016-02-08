@@ -78,14 +78,13 @@ public class DDBIcon extends MalisisIcon
 	{
 		// get mipmapping level
 		int mipmapLevels = Minecraft.getMinecraft().gameSettings.mipmapLevels;
-		boolean anisotropic = Minecraft.getMinecraft().gameSettings.anisotropicFiltering > 1.0F;
 
 		try
 		{
 			InputStream stream = pack.getInputStream(path + ".png");
 			if (stream == null)
 			{
-				DDB.log.error("Using missing texture, file not found : " + getIconName());
+				DDB.log.error("Using missing texture, file not found : " + path);
 				return true;
 			}
 
@@ -94,7 +93,7 @@ public class DDBIcon extends MalisisIcon
 
 			AnimationMetadataSection animMetadata = readAnimation();
 
-			loadSprite(textures, animMetadata, anisotropic);
+			loadSprite(textures, animMetadata);
 			return false;
 		}
 		catch (IOException e)
@@ -106,7 +105,7 @@ public class DDBIcon extends MalisisIcon
 
 	/**
 	 * Reads the .mcmeta file for this {@link DDBIcon}.
-	 * 
+	 *
 	 * @return
 	 */
 	private AnimationMetadataSection readAnimation()

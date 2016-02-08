@@ -26,17 +26,12 @@ package net.malisis.ddb;
 
 import java.util.HashMap;
 
+import net.malisis.core.block.component.SlabComponent;
 import net.malisis.ddb.block.DDBBlock;
-import net.malisis.ddb.block.DDBBlockColored;
-import net.malisis.ddb.block.DDBBlockConnected;
-import net.malisis.ddb.block.DDBMegaTexture;
-import net.malisis.ddb.block.DDBSlab;
-import net.malisis.ddb.block.DDBStairs;
-import net.malisis.ddb.item.DDBItem;
 import net.minecraft.block.Block;
 import net.minecraft.block.Block.SoundType;
 import net.minecraft.block.material.Material;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 import com.google.gson.internal.LinkedTreeMap;
 
@@ -113,30 +108,13 @@ public class BlockDescriptor
 	public int numBlocks = -1;
 	public DDBRecipe recipe;
 
-	public DDBBlock createBlock(BlockPack pack)
+	public void createBlock(BlockPack pack)
 	{
-		switch (type)
-		{
-			case STANDARD:
-			case DIRECTIONAL:
-				return new DDBBlock(pack, this);
-			case COLORED:
-				return new DDBBlockColored(pack, this);
-			case CONNECTED:
-				return new DDBBlockConnected(pack, this);
-			case STAIRS:
-				return new DDBStairs(pack, this);
-			case SLAB:
-				return new DDBSlab(pack, this);
-			case MEGATEXTURE:
-				return new DDBMegaTexture(pack, this);
-		}
-		return null;
-	}
+		DDBBlock block = new DDBBlock(pack, this);
+		if (type == BlockType.SLAB)
+			new SlabComponent(block, new DDBBlock(pack, this));
 
-	public DDBItem createItem(DDBBlock block)
-	{
-		return null;
+		pack.addBlock(block);
 	}
 
 	public Material getMaterial()
@@ -156,18 +134,18 @@ public class BlockDescriptor
 		return textureName != null ? textureName : name;
 	}
 
-	public String getTexture(ForgeDirection dir)
+	public String getTexture(EnumFacing dir)
 	{
 		String textureName = null;
 		if (textures != null)
 		{
-			if (dir == ForgeDirection.DOWN)
+			if (dir == EnumFacing.DOWN)
 				textureName = textures.get("bottom");
-			else if (dir == ForgeDirection.UP)
+			else if (dir == EnumFacing.UP)
 				textureName = textures.get("top");
 			else
 			{
-				if (dir == ForgeDirection.SOUTH)
+				if (dir == EnumFacing.SOUTH)
 					textureName = textures.get("front");
 				if (textureName == null)
 					textureName = textures.get("sides");

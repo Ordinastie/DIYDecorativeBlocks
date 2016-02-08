@@ -37,7 +37,6 @@ import net.malisis.ddb.BlockDescriptor;
 import net.malisis.ddb.BlockPack;
 import net.malisis.ddb.BlockType;
 import net.malisis.ddb.DDB;
-import net.malisis.ddb.block.DDBBlock;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -138,9 +137,10 @@ public class BlockPackJsonReader
 				desc.name = entry.getKey();
 				if (desc.textures != null && desc.textures.get("front") != null && desc.type == BlockType.STANDARD)
 					desc.type = BlockType.DIRECTIONAL;
+				if (desc.type == BlockType.STAIRS)
+					desc.opaque = false;
 
-				DDBBlock block = desc.createBlock(pack);
-				pack.addBlock(block);
+				desc.createBlock(pack);
 			}
 			return null;
 		}

@@ -36,14 +36,12 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import net.malisis.ddb.block.DDBBlock;
-import net.malisis.ddb.item.DDBItem;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.StringTranslate;
+import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.common.registry.LanguageRegistry;
 
 import org.apache.commons.io.FileUtils;
-
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.common.registry.LanguageRegistry;
 
 /**
  * @author Ordinastie
@@ -61,7 +59,6 @@ public class BlockPack
 	private ZipFile zipFile;
 
 	private HashMap<String, DDBBlock> blocks = new HashMap<>();
-	private HashMap<String, DDBItem> items = new HashMap<>();
 
 	public BlockPack(Type type, String name, ZipFile zipFile)
 	{
@@ -141,17 +138,6 @@ public class BlockPack
 	}
 
 	/**
-	 * Gets the {@link DDBItem} with the specified <i>name</i>.
-	 *
-	 * @param name
-	 * @return
-	 */
-	public DDBItem getItem(String name)
-	{
-		return items.get(name);
-	}
-
-	/**
 	 * Adds the <i>block</i> in this {@link BlockPack}.
 	 *
 	 * @param block
@@ -159,16 +145,6 @@ public class BlockPack
 	public void addBlock(DDBBlock block)
 	{
 		blocks.put(block.getName(), block);
-	}
-
-	/**
-	 * Adds the <i>item</i> in this {@link BlockPack}.
-	 *
-	 * @param item
-	 */
-	public void addItem(DDBItem item)
-	{
-		items.put(item.getName(), item);
 	}
 
 	/**
@@ -240,9 +216,7 @@ public class BlockPack
 	public void registerBlocks()
 	{
 		for (DDBBlock block : blocks.values())
-		{
-			GameRegistry.registerBlock(block, block.getItemClass(), block.getName());
-		}
+			block.register();
 	}
 
 	public void registerRecipes()

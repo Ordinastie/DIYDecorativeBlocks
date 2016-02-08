@@ -32,22 +32,16 @@ import net.malisis.core.IMalisisMod;
 import net.malisis.core.MalisisCore;
 import net.malisis.core.configuration.Settings;
 import net.malisis.ddb.block.DDBBlock;
-import net.malisis.ddb.block.DDBStairs;
-import net.malisis.ddb.item.DDBItem;
 import net.malisis.ddb.json.BlockPackJsonReader;
-import net.malisis.ddb.renderer.StairsRenderer;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.Mod.EventHandler;
+import net.minecraftforge.fml.common.Mod.Instance;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.Mod;
-import cpw.mods.fml.common.Mod.EventHandler;
-import cpw.mods.fml.common.Mod.Instance;
-import cpw.mods.fml.common.event.FMLInitializationEvent;
-import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import cpw.mods.fml.relauncher.Side;
 
 /**
  * @author Ordinastie
@@ -112,9 +106,6 @@ public class DDB implements IMalisisMod
 	{
 		for (BlockPack pack : getListPacks())
 			pack.registerRecipes();
-
-		if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
-			new StairsRenderer().registerFor(DDBStairs.class);
 	}
 
 	/**
@@ -182,21 +173,5 @@ public class DDB implements IMalisisMod
 		if (pack == null)
 			return null;
 		return pack.getBlock(blockName);
-	}
-
-	/**
-	 * Gets a <code>DDBItem</code> from the <i>packName</i> <code>BlockPack</code> with the specified <i>itemName</i>
-	 *
-	 * @param packName
-	 * @param itemName
-	 * @return the <code>DDBItem</code> if found or <b>null</b> if the <i>packName</i> doesn't match any pack registered or if the
-	 *         <i>itemName</i> doesn't match any item registered for that pack
-	 */
-	public static DDBItem getItem(String packName, String itemName)
-	{
-		BlockPack pack = getPack(packName);
-		if (pack == null)
-			return null;
-		return pack.getItem(itemName);
 	}
 }
