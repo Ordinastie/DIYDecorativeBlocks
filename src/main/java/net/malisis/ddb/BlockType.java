@@ -24,19 +24,21 @@
 
 package net.malisis.ddb;
 
+import net.minecraft.util.IStringSerializable;
+
 import com.google.gson.annotations.SerializedName;
 
 /**
  * @author Ordinastie
- * 
+ *
  */
-public enum BlockType
+public enum BlockType implements IStringSerializable
 {
 	//@formatter:off
 	@SerializedName("standard")
-	STANDARD, 
+	STANDARD,
 	@SerializedName("directional")
-	DIRECTIONAL, 
+	DIRECTIONAL,
 	@SerializedName("colored")
 	COLORED,
 	@SerializedName("connected")
@@ -46,7 +48,13 @@ public enum BlockType
 	@SerializedName("slab")
 	SLAB,
 	@SerializedName("megaTexture")
-	MEGATEXTURE,
+	MEGATEXTURE,;
+
+	@Override
+	public String getName()
+	{
+		return null;
+	}
 	//@formatter:on
 
 }

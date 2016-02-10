@@ -7,7 +7,7 @@ buildscript {
         }
         maven {
             name = "sonatype"
-            url = "https://oss.sonatype.org/content/repositories/snapshots/"
+            url = "https://oss.sonatype.org/content/repositories/public/"
         }
     }
     dependencies {
@@ -15,25 +15,26 @@ buildscript {
     }
 }
 
+plugins
+{
+	id "com.matthewprenger.cursegradle" version "1.0.7"
+}
+
 apply plugin: 'forge'
 
-sourceCompatibility = 1.7
-targetCompatibility = 1.7
-version = "1.7.10-1.5"
-group= "net.malisis.ddb" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+version = "1.8-2.0"
+group = "net.malisis" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "DIYDecorativeBlocks"
 libsDirName = "../releases"
 
-sourceSets {
-    main {
-        java { srcDirs = ["$projectDir/src"] }
-        resources { srcDirs = ["$projectDir/resources"] }
-    }
-}
 
 dependencies
 {
-	compile 'net.malisis:malisiscore:1.7.10-0.12.10:dev'	
+	//compile 'net.malisis:malisiscore:1.8-1.4.0:dev'
+	compile files('../MalisisCore/build/libs/malisiscore-1.8-1.4.0-dev.jar')	
 }
 
 
@@ -50,7 +51,7 @@ artifacts {
 }
 
 minecraft {
-    version = "1.7.10-10.13.2.1342-1.7.10"
+    version = "1.8-11.14.3.1487"
   	if(file("../../run").exists())
 	{
 		runDir = "../../run/assets"
@@ -62,8 +63,9 @@ minecraft {
 	
 	replace '${version}', project.version
     replaceIn "DDB.java"
-    mappings = "stable_12"
+    mappings = "snapshot_20150711"
 }
+
 
 processResources
 {
@@ -83,4 +85,21 @@ processResources
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info'
     }
+}
+
+
+if (project.hasProperty('curseapi')) {
+	curseforge {
+		apiKey = curseapi
+		project {
+			id = '224461'
+			releaseType = 'release'
+					
+			addArtifact deobfJar
+			
+			relations {
+				requiredLibrary 'malisiscore'
+			}
+		}
+	}
 }

@@ -37,9 +37,9 @@ import net.malisis.core.renderer.icon.provider.SidesIconProvider;
 import net.malisis.ddb.BlockDescriptor;
 import net.malisis.ddb.BlockPack;
 import net.malisis.ddb.BlockType;
+import net.malisis.ddb.Color;
 import net.malisis.ddb.DDB;
 import net.malisis.ddb.DDBIcon;
-import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
@@ -123,8 +123,8 @@ public class DDBBlock extends MalisisBlock implements ISmartCull
 		if (descriptor.type == BlockType.COLORED && !descriptor.useColorMultiplier)
 		{
 			//DDBIcon defaultIcon = new DDBIcon(name, pack, descriptor.getTexture());
-			PropertyEnumIconProvider<EnumDyeColor> iconProvider = new PropertyEnumIconProvider<>(ColorComponent.COLOR, EnumDyeColor.class);
-			for (EnumDyeColor color : EnumDyeColor.values())
+			PropertyEnumIconProvider<Color> iconProvider = new PropertyEnumIconProvider<>(ColorComponent.COLOR, Color.class);
+			for (Color color : Color.values())
 			{
 				String name = getName() + "_" + color.getUnlocalizedName();
 				DDBIcon icon = new DDBIcon(name, pack, descriptor.getTexture() + "_" + color.getUnlocalizedName());
