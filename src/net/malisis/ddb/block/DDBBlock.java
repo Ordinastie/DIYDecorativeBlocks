@@ -24,6 +24,7 @@
 
 package net.malisis.ddb.block;
 
+import net.malisis.core.block.ISmartCull;
 import net.malisis.core.block.MalisisBlock;
 import net.malisis.core.block.component.ColorComponent;
 import net.malisis.core.block.component.DirectionalComponent;
@@ -44,12 +45,14 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumWorldBlockLayer;
 import net.minecraft.world.IBlockAccess;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
  * @author Ordinastie
  *
  */
-public class DDBBlock extends MalisisBlock
+public class DDBBlock extends MalisisBlock implements ISmartCull
 {
 	protected BlockPack pack;
 	protected BlockDescriptor descriptor;
@@ -96,6 +99,7 @@ public class DDBBlock extends MalisisBlock
 	}
 
 	@Override
+	@SideOnly(Side.CLIENT)
 	public void createIconProvider(Object object)
 	{
 		if (descriptor.type == BlockType.MEGATEXTURE)
@@ -152,7 +156,10 @@ public class DDBBlock extends MalisisBlock
 	@Override
 	public boolean isOpaqueCube()
 	{
-		return fullBlock;
+		if (!fullBlock)
+			return false;
+
+		return super.isOpaqueCube();
 	}
 
 	@Override
@@ -166,9 +173,16 @@ public class DDBBlock extends MalisisBlock
 	@Override
 	public boolean shouldSideBeRendered(IBlockAccess world, BlockPos pos, EnumFacing side)
 	{
-		if (descriptor.type == BlockType.CONNECTED)
-			return world.getBlockState(pos).getBlock() != world.getBlockState(pos.offset(side.getOpposite()));
+		if (!isOpaqueCube())
+			if (world.getBlockState(pos).getBlock() == world.getBlockState(pos.offset(side.getOpposite())).getBlock())
+				return false;
 		return super.shouldSideBeRendered(world, pos, side);
+	}
+
+	@Override
+	public boolean shouldSmartCull()
+	{
+		return descriptor.type != BlockType.CONNECTED;
 	}
 
 	public IRecipe getRecipe()
