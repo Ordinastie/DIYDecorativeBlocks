@@ -35,6 +35,8 @@ import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import net.malisis.core.block.IBlockComponent;
+import net.malisis.core.block.component.SlabComponent;
 import net.malisis.ddb.block.DDBBlock;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.StringTranslate;
@@ -216,7 +218,13 @@ public class BlockPack
 	public void registerBlocks()
 	{
 		for (DDBBlock block : blocks.values())
-			block.register();
+		{
+			SlabComponent sc = IBlockComponent.getComponent(SlabComponent.class, block);
+			if (sc != null)
+				sc.register();
+			else
+				block.register();
+		}
 	}
 
 	public void registerRecipes()
