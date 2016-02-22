@@ -26,7 +26,6 @@ package net.malisis.ddb.block;
 
 import net.malisis.core.block.ISmartCull;
 import net.malisis.core.block.MalisisBlock;
-import net.malisis.core.block.component.ColorComponent;
 import net.malisis.core.block.component.DirectionalComponent;
 import net.malisis.core.block.component.StairComponent;
 import net.malisis.core.renderer.icon.MalisisIcon;
@@ -81,7 +80,7 @@ public class DDBBlock extends MalisisBlock implements ISmartCull
 				addComponent(new StairComponent());
 				break;
 			case COLORED:
-				addComponent(new ColorComponent(descriptor.useColorMultiplier));
+				addComponent(new DDBColorComponent(descriptor.useColorMultiplier));
 				break;
 			default:
 				break;
@@ -123,7 +122,7 @@ public class DDBBlock extends MalisisBlock implements ISmartCull
 		if (descriptor.type == BlockType.COLORED && !descriptor.useColorMultiplier)
 		{
 			//DDBIcon defaultIcon = new DDBIcon(name, pack, descriptor.getTexture());
-			PropertyEnumIconProvider<Color> iconProvider = new PropertyEnumIconProvider<>(ColorComponent.COLOR, Color.class);
+			PropertyEnumIconProvider<Color> iconProvider = new PropertyEnumIconProvider<>(DDBColorComponent.COLOR, Color.class);
 			for (Color color : Color.values())
 			{
 				String name = getName() + "_" + color.getUnlocalizedName();

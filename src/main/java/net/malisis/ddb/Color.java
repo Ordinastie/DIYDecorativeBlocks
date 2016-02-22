@@ -26,12 +26,13 @@ package net.malisis.ddb;
 
 import net.minecraft.block.material.MapColor;
 import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.IStringSerializable;
 
 /**
  * @author Ordinastie
  *
  */
-public enum Color
+public enum Color implements IStringSerializable
 {
 	//@formatter:off
     WHITE(0, 15, "white", "white", MapColor.snowColor, EnumChatFormatting.WHITE),
@@ -113,6 +114,7 @@ public enum Color
 		return this.unlocalizedName;
 	}
 
+	@Override
 	public String getName()
 	{
 		return this.name;
