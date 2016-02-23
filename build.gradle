@@ -87,6 +87,15 @@ processResources
     }
 }
 
+def commonManifest = {
+		mainAttributes(	"Built-By": "Ordinastie",
+						"Created-By": System.properties['java.vm.version'] + " (" + System.properties['java.vm.vendor'] + ")",
+						"Implementation-Title": name,
+						"Implementation-Version": version,
+						"Implementation-Vendor": url)
+}
+jar.manifest commonManifest
+
 
 if (project.hasProperty('curseapi')) {
 	curseforge {
