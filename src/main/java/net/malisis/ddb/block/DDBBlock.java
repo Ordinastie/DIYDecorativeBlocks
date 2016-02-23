@@ -26,6 +26,7 @@ package net.malisis.ddb.block;
 
 import net.malisis.core.block.ISmartCull;
 import net.malisis.core.block.MalisisBlock;
+import net.malisis.core.block.component.ColorComponent;
 import net.malisis.core.block.component.DirectionalComponent;
 import net.malisis.core.block.component.StairComponent;
 import net.malisis.core.renderer.icon.MalisisIcon;
@@ -36,9 +37,9 @@ import net.malisis.core.renderer.icon.provider.SidesIconProvider;
 import net.malisis.ddb.BlockDescriptor;
 import net.malisis.ddb.BlockPack;
 import net.malisis.ddb.BlockType;
-import net.malisis.ddb.Color;
 import net.malisis.ddb.DDB;
 import net.malisis.ddb.DDBIcon;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
@@ -80,13 +81,14 @@ public class DDBBlock extends MalisisBlock implements ISmartCull
 				addComponent(new StairComponent());
 				break;
 			case COLORED:
-				addComponent(new DDBColorComponent(descriptor.useColorMultiplier));
+				addComponent(new ColorComponent(descriptor.useColorMultiplier));
 				break;
 			default:
 				break;
 		}
 	}
 
+	@Override
 	public String getName()
 	{
 		return name;
@@ -122,8 +124,8 @@ public class DDBBlock extends MalisisBlock implements ISmartCull
 		if (descriptor.type == BlockType.COLORED && !descriptor.useColorMultiplier)
 		{
 			//DDBIcon defaultIcon = new DDBIcon(name, pack, descriptor.getTexture());
-			PropertyEnumIconProvider<Color> iconProvider = new PropertyEnumIconProvider<>(DDBColorComponent.COLOR, Color.class);
-			for (Color color : Color.values())
+			PropertyEnumIconProvider<EnumDyeColor> iconProvider = new PropertyEnumIconProvider<>(ColorComponent.COLOR, EnumDyeColor.class);
+			for (EnumDyeColor color : EnumDyeColor.values())
 			{
 				String name = getName() + "_" + color.getUnlocalizedName();
 				DDBIcon icon = new DDBIcon(name, pack, descriptor.getTexture() + "_" + color.getUnlocalizedName());

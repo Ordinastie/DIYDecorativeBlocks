@@ -52,9 +52,9 @@ public class DDBRecipe
 	public int amount = 1;
 	public boolean shapeless = false;
 
-	private HashMap<String, Character> charList = new HashMap<>();
-	private HashMap<String, Item> itemList = new HashMap<>();
-	private char currentChar = 'A';
+	private transient HashMap<String, Character> charList = new HashMap<>();
+	private transient HashMap<String, Item> itemList = new HashMap<>();
+	private transient char currentChar = 'A';
 
 	private char getChar(String itemString)
 	{
@@ -110,7 +110,7 @@ public class DDBRecipe
 			if (OreDictionary.getOres(itemString).size() > 0)
 				return itemString;
 			else
-				item = (Item) Item.itemRegistry.getObject(itemString);
+				item = Item.getByNameOrId(itemString);
 			if (item == null)
 			{
 				DDB.log.error("Couldn't find entry for item {} ({}), recipe ignored.", itemString, str);

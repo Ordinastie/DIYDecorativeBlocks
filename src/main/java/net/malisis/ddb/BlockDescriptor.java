@@ -41,8 +41,8 @@ import com.google.gson.internal.LinkedTreeMap;
  */
 public class BlockDescriptor
 {
-	private static HashMap<String, Material> materials = new HashMap<>();
-	private static HashMap<String, SoundType> soundTypes = new HashMap<>();
+	private transient static HashMap<String, Material> materials = new HashMap<>();
+	private transient static HashMap<String, SoundType> soundTypes = new HashMap<>();
 	static
 	{
 		materials.put("air", Material.air);
