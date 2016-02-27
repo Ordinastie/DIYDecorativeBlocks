@@ -36,7 +36,7 @@ import net.minecraft.item.crafting.FurnaceRecipes;
 public class DDBSmeltingRecipe
 {
 	public String item;
-	public float xp = 1;
+	public float xp = 0.1F;
 
 	public void addFurnaceRecipe(DDBBlock block)
 	{
