@@ -28,11 +28,13 @@ import net.malisis.core.block.ISmartCull;
 import net.malisis.core.block.MalisisBlock;
 import net.malisis.core.block.component.DirectionalComponent;
 import net.malisis.core.block.component.StairComponent;
+import net.malisis.core.block.component.WallComponent;
 import net.malisis.core.renderer.icon.MalisisIcon;
 import net.malisis.core.renderer.icon.provider.ConnectedIconsProvider;
 import net.malisis.core.renderer.icon.provider.MegaTextureIconProvider;
 import net.malisis.core.renderer.icon.provider.PropertyEnumIconProvider;
 import net.malisis.core.renderer.icon.provider.SidesIconProvider;
+import net.malisis.core.renderer.icon.provider.WallIconProvider;
 import net.malisis.ddb.BlockDescriptor;
 import net.malisis.ddb.BlockPack;
 import net.malisis.ddb.BlockType;
@@ -44,8 +46,11 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumWorldBlockLayer;
 import net.minecraft.world.IBlockAccess;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author Ordinastie
@@ -82,6 +87,8 @@ public class DDBBlock extends MalisisBlock implements ISmartCull
 			case COLORED:
 				addComponent(new DDBColorComponent(descriptor.useColorMultiplier));
 				break;
+			case WALL:
+				addComponent(new WallComponent());
 			default:
 				break;
 		}
@@ -101,9 +108,11 @@ public class DDBBlock extends MalisisBlock implements ISmartCull
 	@SideOnly(Side.CLIENT)
 	public void createIconProvider(Object object)
 	{
+		MalisisIcon defaultIcon = null;
+
 		if (descriptor.type == BlockType.MEGATEXTURE)
 		{
-			DDBIcon defaultIcon = new DDBIcon(getName(), pack, descriptor.getTexture());
+			defaultIcon = new DDBIcon(getName(), pack, descriptor.getTexture());
 			MegaTextureIconProvider iconProvider = new MegaTextureIconProvider(defaultIcon);
 			for (EnumFacing facing : EnumFacing.VALUES)
 				iconProvider.setMegaTexture(facing, defaultIcon, descriptor.numBlocks);
@@ -119,7 +128,7 @@ public class DDBBlock extends MalisisBlock implements ISmartCull
 			iconProvider = new ConnectedIconsProvider(part1, part2);
 			return;
 		}
-		if (descriptor.type == BlockType.COLORED && !descriptor.useColorMultiplier)
+		else if (descriptor.type == BlockType.COLORED && !descriptor.useColorMultiplier)
 		{
 			//DDBIcon defaultIcon = new DDBIcon(name, pack, descriptor.getTexture());
 			PropertyEnumIconProvider<Color> iconProvider = new PropertyEnumIconProvider<>(DDBColorComponent.COLOR, Color.class);
@@ -133,8 +142,27 @@ public class DDBBlock extends MalisisBlock implements ISmartCull
 			this.iconProvider = iconProvider;
 			return;
 		}
+		else if (descriptor.type == BlockType.WALL)
+		{
+			String insideName = descriptor.getTexture("inside");
+			String outsideName = descriptor.getTexture("outside");
 
-		MalisisIcon defaultIcon = null;
+			if (!StringUtils.isEmpty(insideName) && !StringUtils.isEmpty(outsideName))
+			{
+				DDBIcon inside = new DDBIcon(getName() + "_inside", pack, insideName);
+				DDBIcon outside = new DDBIcon(getName() + "_outside", pack, outsideName);
+				this.iconProvider = new WallIconProvider(inside, outside);
+				return;
+			}
+			else
+			{
+				if (!StringUtils.isEmpty(insideName))
+					defaultIcon = new DDBIcon(getName(), pack, insideName);
+				else if (!StringUtils.isEmpty(outsideName))
+					defaultIcon = new DDBIcon(getName(), pack, outsideName);
+			}
+		}
+
 		MalisisIcon[] sideIcons = new DDBIcon[6];
 		for (EnumFacing dir : EnumFacing.VALUES)
 		{
@@ -145,9 +173,6 @@ public class DDBBlock extends MalisisBlock implements ISmartCull
 			else if (defaultIcon == null)
 				defaultIcon = new DDBIcon(name, pack, descriptor.getTexture());
 		}
-
-		//		if (descriptor.type == BlockType.STAIRS)
-		//			defaultIcon = new VanillaIcon(Blocks.planks);
 
 		iconProvider = new SidesIconProvider(defaultIcon, sideIcons);
 	}
@@ -178,16 +203,13 @@ public class DDBBlock extends MalisisBlock implements ISmartCull
 		return super.shouldSideBeRendered(world, pos, side);
 	}
 
-	@Override
-	public boolean shouldSmartCull()
+	public void registerRecipes()
 	{
-		return descriptor.type != BlockType.CONNECTED;
-	}
+		IRecipe recipe = descriptor.recipe != null ? descriptor.recipe.createRecipe(this) : null;
+		if (recipe != null)
+			GameRegistry.addRecipe(recipe);
 
-	public IRecipe getRecipe()
-	{
-		if (descriptor.recipe == null)
-			return null;
-		return descriptor.recipe.createRecipe(this);
+		if (descriptor.furnaceRecipe != null)
+			descriptor.furnaceRecipe.addFurnaceRecipe(this);
 	}
 }

@@ -107,6 +107,7 @@ public class BlockDescriptor
 	public int lightValue = 0;
 	public int numBlocks = -1;
 	public DDBRecipe recipe;
+	public DDBSmeltingRecipe furnaceRecipe;
 
 	public void createBlock(BlockPack pack)
 	{
@@ -134,22 +135,27 @@ public class BlockDescriptor
 		return textureName != null ? textureName : name;
 	}
 
+	public String getTexture(String key)
+	{
+		return textures != null ? textures.get(key) : null;
+	}
+
 	public String getTexture(EnumFacing dir)
 	{
+		if (textures == null)
+			return null;
+
 		String textureName = null;
-		if (textures != null)
+		if (dir == EnumFacing.DOWN)
+			textureName = textures.get("bottom");
+		else if (dir == EnumFacing.UP)
+			textureName = textures.get("top");
+		else
 		{
-			if (dir == EnumFacing.DOWN)
-				textureName = textures.get("bottom");
-			else if (dir == EnumFacing.UP)
-				textureName = textures.get("top");
-			else
-			{
-				if (dir == EnumFacing.SOUTH)
-					textureName = textures.get("front");
-				if (textureName == null)
-					textureName = textures.get("sides");
-			}
+			if (dir == EnumFacing.SOUTH)
+				textureName = textures.get("front");
+			if (textureName == null)
+				textureName = textures.get("sides");
 		}
 
 		return textureName;

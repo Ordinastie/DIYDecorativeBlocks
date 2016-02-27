@@ -38,9 +38,7 @@ import java.util.zip.ZipFile;
 import net.malisis.core.block.IBlockComponent;
 import net.malisis.core.block.component.SlabComponent;
 import net.malisis.ddb.block.DDBBlock;
-import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.StringTranslate;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.common.registry.LanguageRegistry;
 
 import org.apache.commons.io.FileUtils;
@@ -231,9 +229,7 @@ public class BlockPack
 	{
 		for (DDBBlock block : blocks.values())
 		{
-			IRecipe recipe = block.getRecipe();
-			if (recipe != null)
-				GameRegistry.addRecipe(recipe);
+			block.registerRecipes();
 		}
 	}
 

@@ -24,39 +24,27 @@
 
 package net.malisis.ddb;
 
-import net.minecraft.util.IStringSerializable;
-
-import com.google.gson.annotations.SerializedName;
+import net.malisis.core.util.ItemUtils;
+import net.malisis.ddb.block.DDBBlock;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.FurnaceRecipes;
 
 /**
  * @author Ordinastie
  *
  */
-public enum BlockType implements IStringSerializable
+public class DDBSmeltingRecipe
 {
-	//@formatter:off
-	@SerializedName("standard")
-	STANDARD,
-	@SerializedName("directional")
-	DIRECTIONAL,
-	@SerializedName("colored")
-	COLORED,
-	@SerializedName("connected")
-	CONNECTED,
-	@SerializedName("stairs")
-	STAIRS,
-	@SerializedName("slab")
-	SLAB,
-	@SerializedName("megaTexture")
-	MEGATEXTURE,
-	@SerializedName("wall")
-	WALL,;
+	public String item;
+	public float xp = 0.1F;
 
-	@Override
-	public String getName()
+	public void addFurnaceRecipe(DDBBlock block)
 	{
-		return null;
+		ItemStack itemStack = ItemUtils.getItemStack(item);
+		if (itemStack == null)
+			return;
+
+		FurnaceRecipes.instance().addSmeltingRecipe(itemStack, new ItemStack(block), xp);
 	}
-	//@formatter:on
 
 }
