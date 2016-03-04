@@ -150,17 +150,17 @@ public class DDBBlock extends MalisisBlock
 
 			if (!StringUtils.isEmpty(insideName) && !StringUtils.isEmpty(outsideName))
 			{
-				DDBIcon inside = new DDBIcon(getName() + "_inside", pack, insideName);
-				DDBIcon outside = new DDBIcon(getName() + "_outside", pack, outsideName);
+				MalisisIcon inside = DDBIcon.getIcon(getName() + "_inside", pack, insideName);
+				MalisisIcon outside = DDBIcon.getIcon(getName() + "_outside", pack, outsideName);
 				this.iconProvider = new WallIconProvider(inside, outside);
 				return;
 			}
 			else
 			{
 				if (!StringUtils.isEmpty(insideName))
-					defaultIcon = new DDBIcon(getName(), pack, insideName);
+					defaultIcon = DDBIcon.getIcon(getName(), pack, insideName);
 				else if (!StringUtils.isEmpty(outsideName))
-					defaultIcon = new DDBIcon(getName(), pack, outsideName);
+					defaultIcon = DDBIcon.getIcon(getName(), pack, outsideName);
 			}
 		}
 
@@ -170,9 +170,9 @@ public class DDBBlock extends MalisisBlock
 			String textureName = descriptor.getTexture(dir);
 
 			if (textureName != null)
-				sideIcons[dir.ordinal()] = new DDBIcon(name + "_" + dir.toString(), pack, textureName);
+				sideIcons[dir.ordinal()] = DDBIcon.getIcon(name + "_" + dir.toString(), pack, textureName);
 			else if (defaultIcon == null)
-				defaultIcon = new DDBIcon(name, pack, descriptor.getTexture());
+				defaultIcon = DDBIcon.getIcon(name, pack, descriptor.getTexture());
 		}
 
 		iconProvider = new SidesIconProvider(defaultIcon, sideIcons);
