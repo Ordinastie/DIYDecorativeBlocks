@@ -33,11 +33,14 @@ import java.io.InputStreamReader;
 import javax.imageio.ImageIO;
 
 import net.malisis.core.renderer.icon.MalisisIcon;
+import net.malisis.core.renderer.icon.VanillaIcon;
+import net.malisis.core.util.ItemUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.client.resources.data.AnimationMetadataSection;
 import net.minecraft.client.resources.data.AnimationMetadataSectionSerializer;
 import net.minecraft.client.resources.data.IMetadataSerializer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
 import org.apache.commons.io.IOUtils;
@@ -130,5 +133,19 @@ public class DDBIcon extends MalisisIcon
 		{
 			IOUtils.closeQuietly(bufferedreader);
 		}
+	}
+
+	public static MalisisIcon getIcon(String name, BlockPack pack, String path)
+	{
+		if (path.indexOf(":") != -1)
+		{
+			ItemStack itemStack = ItemUtils.getItemStack(path);
+			if (itemStack == null)
+				return MalisisIcon.missing;
+
+			return new VanillaIcon(itemStack.getItem(), itemStack.getMetadata());
+		}
+
+		return new DDBIcon(name, pack, path);
 	}
 }
