@@ -163,7 +163,7 @@ public class DDBBlock extends MalisisBlock implements ISmartCull
 			}
 		}
 
-		MalisisIcon[] sideIcons = new DDBIcon[6];
+		MalisisIcon[] sideIcons = new MalisisIcon[6];
 		for (EnumFacing dir : EnumFacing.VALUES)
 		{
 			String textureName = descriptor.getTexture(dir);
