@@ -27,6 +27,7 @@ package net.malisis.ddb.block;
 import net.malisis.core.block.MalisisBlock;
 import net.malisis.core.block.component.ColorComponent;
 import net.malisis.core.block.component.DirectionalComponent;
+import net.malisis.core.block.component.PaneComponent;
 import net.malisis.core.block.component.StairComponent;
 import net.malisis.core.block.component.WallComponent;
 import net.malisis.core.renderer.icon.MalisisIcon;
@@ -89,6 +90,10 @@ public class DDBBlock extends MalisisBlock
 				break;
 			case WALL:
 				addComponent(new WallComponent());
+				break;
+			case PANE:
+				addComponent(new PaneComponent());
+				break;
 			default:
 				break;
 		}

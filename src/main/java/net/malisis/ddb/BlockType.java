@@ -50,12 +50,14 @@ public enum BlockType implements IStringSerializable
 	@SerializedName("megaTexture")
 	MEGATEXTURE,
 	@SerializedName("wall")
-	WALL,;
+	WALL,
+	@SerializedName("pane")
+	PANE,;
 
 	@Override
 	public String getName()
 	{
-		return null;
+		return name();
 	}
 	//@formatter:on
 
