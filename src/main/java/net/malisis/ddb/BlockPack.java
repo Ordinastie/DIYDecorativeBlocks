@@ -27,28 +27,54 @@ package net.malisis.ddb;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Map.Entry;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import net.malisis.core.MalisisCore;
+import net.malisis.core.asm.AsmUtils;
 import net.malisis.core.block.IBlockComponent;
 import net.malisis.core.block.component.SlabComponent;
+import net.malisis.core.util.Silenced;
 import net.malisis.ddb.block.DDBBlock;
-import net.minecraft.util.StringTranslate;
-import net.minecraftforge.fml.common.registry.LanguageRegistry;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.IReloadableResourceManager;
+import net.minecraft.client.resources.IResourceManager;
+import net.minecraft.client.resources.IResourceManagerReloadListener;
+import net.minecraft.client.resources.Language;
+import net.minecraft.util.text.translation.LanguageMap;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import org.apache.commons.io.FileUtils;
+
+import com.google.common.collect.Maps;
 
 /**
  * @author Ordinastie
  *
  */
+
+@SuppressWarnings("unchecked")
 public class BlockPack
 {
+	private static Map<String, String> languageList = Maps.newHashMap();
+	static
+	{
+		try
+		{
+			LanguageMap languageMap = (LanguageMap) AsmUtils.changeFieldAccess(LanguageMap.class, "instance", "field_74817_a").get(null);
+			languageList = (Map<String, String>) AsmUtils.changeFieldAccess(LanguageMap.class, "languageList", "field_74816_c").get(
+					languageMap);
+		}
+		catch (ReflectiveOperationException e)
+		{
+			DDB.log.error("Could not get language list, localizations unavailable.", e);
+		}
+
+	}
+
 	public enum Type
 	{
 		FOLDER, ZIP
@@ -66,7 +92,9 @@ public class BlockPack
 		this.name = name;
 		this.zipFile = zipFile;
 
-		readLangFiles();
+		if (MalisisCore.isClient())
+			((IReloadableResourceManager) Minecraft.getMinecraft().getResourceManager()).registerReloadListener(new Reloader());
+
 	}
 
 	/**
@@ -147,67 +175,19 @@ public class BlockPack
 		blocks.put(block.getName(), block);
 	}
 
-	/**
-	 * List all lang files inside this {@link BlockPack}.
-	 *
-	 * @return the hash map
-	 */
-	private HashMap<String, String> listLangFiles()
-	{
-		HashMap<String, String> list = new HashMap<>();
-
-		if (type == Type.FOLDER)
-		{
-			String path = "lang/";
-			File dir = new File(getDirectory() + path);
-			if (dir.isDirectory())
-			{
-				for (File file : dir.listFiles())
-				{
-					String name = file.getName();
-					list.put(name.substring(0, name.length() - 5), path + name);
-				}
-			}
-		}
-		else
-		{
-			Pattern langPattern = Pattern.compile("lang/(.*)\\.lang");
-			Enumeration<? extends ZipEntry> entries = zipFile.entries();
-			while (entries.hasMoreElements())
-			{
-				String name = entries.nextElement().getName();
-				Matcher matcher = langPattern.matcher(name);
-				if (matcher.matches())
-				{
-					list.put(matcher.group(1), name);
-				}
-
-			}
-		}
-
-		return list;
-	}
-
-	/**
-	 * Read and load all lang files in this {@link BlockPack}.
-	 */
 	private void readLangFiles()
 	{
-		HashMap<String, String> files = listLangFiles();
-		for (Entry<String, String> entry : files.entrySet())
-		{
-			String lang = entry.getKey();
-			String file = entry.getValue();
+		//always load the english localization
+		loadLang("en_US");
+		Language current = Minecraft.getMinecraft().getLanguageManager().getCurrentLanguage();
+		if (current != null && !"en_US".equals(current.getLanguageCode()))
+			loadLang(current.getLanguageCode());
+	}
 
-			try
-			{
-				LanguageRegistry.instance().injectLanguage(lang, StringTranslate.parseLangFile(getInputStream(file)));
-			}
-			catch (IOException e)
-			{
-				DDB.log.error("Failed to read lang file {} : \n{}", name, e.getMessage());
-			}
-		}
+	private void loadLang(String lang)
+	{
+		Map<String, String> map = LanguageMap.parseLangFile(Silenced.get(() -> getInputStream("lang/" + lang + ".lang")));
+		languageList.putAll(map);
 	}
 
 	/**
@@ -233,4 +213,13 @@ public class BlockPack
 		}
 	}
 
+	@SideOnly(Side.CLIENT)
+	public class Reloader implements IResourceManagerReloadListener
+	{
+		@Override
+		public void onResourceManagerReload(IResourceManager resourceManager)
+		{
+			readLangFiles();
+		}
+	}
 }

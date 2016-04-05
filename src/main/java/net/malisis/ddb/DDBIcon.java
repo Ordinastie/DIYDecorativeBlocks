@@ -29,14 +29,22 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Field;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
-import javax.imageio.ImageIO;
-
+import net.malisis.core.asm.AsmUtils;
 import net.malisis.core.renderer.icon.MalisisIcon;
 import net.malisis.core.renderer.icon.VanillaIcon;
 import net.malisis.core.util.ItemUtils;
+import net.malisis.core.util.Silenced;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.texture.TextureUtil;
+import net.minecraft.client.resources.IResource;
 import net.minecraft.client.resources.IResourceManager;
+import net.minecraft.client.resources.data.AnimationFrame;
 import net.minecraft.client.resources.data.AnimationMetadataSection;
 import net.minecraft.client.resources.data.AnimationMetadataSectionSerializer;
 import net.minecraft.client.resources.data.IMetadataSerializer;
@@ -54,6 +62,9 @@ import com.google.gson.JsonParser;
  */
 public class DDBIcon extends MalisisIcon
 {
+	private final static Field animationMetadataField = AsmUtils.changeFieldAccess(TextureAtlasSprite.class, "animationMetadata",
+			"field_110982_k");
+
 	private final static IMetadataSerializer serializer = new IMetadataSerializer();
 	static
 	{
@@ -79,31 +90,94 @@ public class DDBIcon extends MalisisIcon
 	@Override
 	public boolean load(IResourceManager manager, ResourceLocation location)
 	{
-		// get mipmapping level
-		int mipmapLevels = Minecraft.getMinecraft().gameSettings.mipmapLevels;
-
 		try
 		{
-			InputStream stream = pack.getInputStream(path + ".png");
-			if (stream == null)
-			{
-				DDB.log.error("Using missing texture, file not found : " + path);
-				return true;
-			}
-
-			BufferedImage[] textures = new BufferedImage[1 + mipmapLevels];
-			textures[0] = ImageIO.read(stream);
-
-			AnimationMetadataSection animMetadata = readAnimation();
-
-			loadSprite(textures, animMetadata);
-			return false;
+			loadSpriteFrames(null, Minecraft.getMinecraft().gameSettings.mipmapLevels + 1);
 		}
-		catch (IOException e)
+		catch (Exception e)
 		{
-			DDB.log.error("Using missing texture, unable to load " + getIconName(), e.getMessage());
-			return true;
+			DDB.log.error("Using loading texture " + path, e);
 		}
+
+		return false;
+	}
+
+	private void addFrame(BufferedImage img, int index, int mipmapLevels)
+	{
+		int[][] mipmaps = new int[mipmapLevels][];
+		mipmaps[0] = getFrame(img, index);
+
+		while (framesTextureData.size() <= index)
+			framesTextureData.add(null);
+
+		framesTextureData.set(index, mipmaps);
+	}
+
+	private int[] getFrame(BufferedImage img, int index)
+	{
+		int[] pixels = new int[width * height];
+		int startY = height * index;
+		if (startY < img.getHeight())
+			img.getRGB(0, startY, width, height, pixels, 0, width);
+		return pixels;
+	}
+
+	@Override
+	public void loadSpriteFrames(IResource resource, int mipmapLevels) throws IOException
+	{
+		InputStream stream = pack.getInputStream(path + ".png");
+		if (stream == null)
+		{
+			DDB.log.error("Using missing texture, file not found : " + path);
+			return;
+		}
+
+		BufferedImage img = TextureUtil.readBufferedImage(stream);
+		AnimationMetadataSection animMetadata = readAnimation();
+
+		if (img == null)
+		{
+			DDB.log.error("Using missing texture, could not read file : " + path);
+			return;
+		}
+
+		width = img.getWidth();
+		height = width;
+
+		if (animMetadata == null)
+		{
+			addFrame(img, 0, mipmapLevels);
+			return;
+		}
+
+		int nbFrames = img.getHeight() / this.width;
+		boolean hasFrameCount = animMetadata.getFrameCount() > 0;
+
+		//add frames
+		IntStream is = hasFrameCount ? getFrameIndexStream(animMetadata, nbFrames) : IntStream.rangeClosed(0, nbFrames);
+		is.forEach(index -> addFrame(img, index, mipmapLevels));
+		is.close();
+
+		//make the AnimationFrame list
+		IntStream is2 = hasFrameCount ? getFrameIndexStream(animMetadata, nbFrames) : IntStream.rangeClosed(0, nbFrames);
+		List<AnimationFrame> list = is2.mapToObj(index -> new AnimationFrame(index, -1)).collect(Collectors.toList());
+		is2.close();
+
+		if (hasFrameCount)
+			animMetadata = new AnimationMetadataSection(list, this.width, this.height, animMetadata.getFrameTime(),
+					animMetadata.isInterpolate());
+
+		saveAnimationMetadata(animMetadata);
+	}
+
+	private IntStream getFrameIndexStream(AnimationMetadataSection animMetadata, int nbFrames)
+	{
+		return animMetadata.getFrameIndexSet().stream().filter((index) -> index <= nbFrames).mapToInt(Integer::intValue);
+	}
+
+	private void saveAnimationMetadata(AnimationMetadataSection animationMetadata)
+	{
+		Silenced.exec(() -> animationMetadataField.set(this, animationMetadata));
 	}
 
 	/**

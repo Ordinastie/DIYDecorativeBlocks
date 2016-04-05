@@ -41,11 +41,12 @@ import net.malisis.ddb.BlockPack;
 import net.malisis.ddb.BlockType;
 import net.malisis.ddb.DDB;
 import net.malisis.ddb.DDBIcon;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumWorldBlockLayer;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
@@ -73,7 +74,7 @@ public class DDBBlock extends MalisisBlock
 
 		setName(pack.getName() + "_" + descriptor.name);
 		setHardness(descriptor.hardness);
-		setStepSound(descriptor.getSoundType());
+		setSoundType(descriptor.getSoundType());
 
 		setCreativeTab(DDB.tab);
 
@@ -184,30 +185,30 @@ public class DDBBlock extends MalisisBlock
 	}
 
 	@Override
-	public boolean isOpaqueCube()
+	public boolean isOpaqueCube(IBlockState state)
 	{
 		if (!fullBlock)
 			return false;
 
-		return super.isOpaqueCube();
+		return super.isOpaqueCube(state);
 	}
 
 	@Override
-	public boolean canRenderInLayer(EnumWorldBlockLayer layer)
+	public boolean canRenderInLayer(BlockRenderLayer layer)
 	{
 		if (descriptor.translucent)
-			return layer == EnumWorldBlockLayer.TRANSLUCENT;
-		return layer == EnumWorldBlockLayer.CUTOUT_MIPPED;
+			return layer == BlockRenderLayer.TRANSLUCENT;
+		return layer == BlockRenderLayer.CUTOUT_MIPPED;
 	}
 
 	@Override
-	public boolean shouldSideBeRendered(IBlockAccess world, BlockPos pos, EnumFacing side)
+	public boolean shouldCheckWeakPower(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side)
 	{
 		//Called for CONNECTED
-		if (!isOpaqueCube())
+		if (!isOpaqueCube(state))
 			if (world.getBlockState(pos).getBlock() == world.getBlockState(pos.offset(side.getOpposite())).getBlock())
 				return false;
-		return super.shouldSideBeRendered(world, pos, side);
+		return super.shouldSideBeRendered(state, world, pos, side);
 	}
 
 	//	@Override

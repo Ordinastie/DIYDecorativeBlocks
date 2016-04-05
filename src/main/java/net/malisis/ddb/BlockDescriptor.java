@@ -28,8 +28,7 @@ import java.util.HashMap;
 
 import net.malisis.core.block.component.SlabComponent;
 import net.malisis.ddb.block.DDBBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.Block.SoundType;
+import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.util.EnumFacing;
 
@@ -79,18 +78,19 @@ public class BlockDescriptor
 		materials.put("cake", Material.cake);
 		materials.put("web", Material.web);
 
-		soundTypes.put("stone", Block.soundTypeStone);
-		soundTypes.put("wood", Block.soundTypeWood);
-		soundTypes.put("gravel", Block.soundTypeGravel);
-		soundTypes.put("grass", Block.soundTypeGrass);
-		soundTypes.put("piston", Block.soundTypePiston);
-		soundTypes.put("metal", Block.soundTypeMetal);
-		soundTypes.put("glass", Block.soundTypeGlass);
-		soundTypes.put("cloth", Block.soundTypeCloth);
-		soundTypes.put("sand", Block.soundTypeSand);
-		soundTypes.put("snow", Block.soundTypeSnow);
-		soundTypes.put("ladder", Block.soundTypeLadder);
-		soundTypes.put("anvil", Block.soundTypeAnvil);
+		soundTypes.put("stone", SoundType.STONE);
+		soundTypes.put("wood", SoundType.WOOD);
+		soundTypes.put("gravel", SoundType.SAND);
+		soundTypes.put("grass", SoundType.GROUND);
+		soundTypes.put("piston", SoundType.PLANT);
+		soundTypes.put("metal", SoundType.METAL);
+		soundTypes.put("glass", SoundType.GLASS);
+		soundTypes.put("cloth", SoundType.CLOTH);
+		soundTypes.put("sand", SoundType.SAND);
+		soundTypes.put("snow", SoundType.SNOW);
+		soundTypes.put("ladder", SoundType.LADDER);
+		soundTypes.put("anvil", SoundType.ANVIL);
+		soundTypes.put("slime", SoundType.SLIME);
 	}
 
 	public BlockType type = BlockType.STANDARD;
@@ -127,7 +127,7 @@ public class BlockDescriptor
 	public SoundType getSoundType()
 	{
 		SoundType sound = soundTypes.get(soundType);
-		return sound != null ? sound : Block.soundTypeWood;
+		return sound != null ? sound : SoundType.WOOD;
 	}
 
 	public String getTexture()
