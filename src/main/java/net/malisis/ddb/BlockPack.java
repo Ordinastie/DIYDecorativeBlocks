@@ -34,7 +34,7 @@ import java.util.zip.ZipFile;
 
 import net.malisis.core.MalisisCore;
 import net.malisis.core.asm.AsmUtils;
-import net.malisis.core.block.IBlockComponent;
+import net.malisis.core.block.IComponent;
 import net.malisis.core.block.component.SlabComponent;
 import net.malisis.core.util.Silenced;
 import net.malisis.ddb.block.DDBBlock;
@@ -65,8 +65,8 @@ public class BlockPack
 		try
 		{
 			LanguageMap languageMap = (LanguageMap) AsmUtils.changeFieldAccess(LanguageMap.class, "instance", "field_74817_a").get(null);
-			languageList = (Map<String, String>) AsmUtils.changeFieldAccess(LanguageMap.class, "languageList", "field_74816_c").get(
-					languageMap);
+			languageList = (Map<String, String>) AsmUtils.changeFieldAccess(LanguageMap.class, "languageList", "field_74816_c")
+															.get(languageMap);
 		}
 		catch (ReflectiveOperationException e)
 		{
@@ -197,7 +197,7 @@ public class BlockPack
 	{
 		for (DDBBlock block : blocks.values())
 		{
-			SlabComponent sc = IBlockComponent.getComponent(SlabComponent.class, block);
+			SlabComponent sc = IComponent.getComponent(SlabComponent.class, block);
 			if (sc != null)
 				sc.register();
 			else
