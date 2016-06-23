@@ -44,39 +44,39 @@ public class BlockDescriptor
 	private transient static HashMap<String, SoundType> soundTypes = new HashMap<>();
 	static
 	{
-		materials.put("air", Material.air);
-		materials.put("grass", Material.grass);
-		materials.put("ground", Material.ground);
-		materials.put("wood", Material.wood);
-		materials.put("rock", Material.rock);
-		materials.put("iron", Material.iron);
-		materials.put("anvil", Material.anvil);
-		materials.put("water", Material.water);
-		materials.put("lava", Material.lava);
-		materials.put("leaves", Material.leaves);
-		materials.put("plants", Material.plants);
-		materials.put("vine", Material.vine);
-		materials.put("sponge", Material.sponge);
-		materials.put("cloth", Material.cloth);
-		materials.put("fire", Material.fire);
-		materials.put("sand", Material.sand);
-		materials.put("circuits", Material.circuits);
-		materials.put("carpet", Material.carpet);
-		materials.put("glass", Material.glass);
-		materials.put("redstoneLight", Material.redstoneLight);
-		materials.put("tnt", Material.tnt);
-		materials.put("coral", Material.coral);
-		materials.put("ice", Material.ice);
-		materials.put("packedIce", Material.packedIce);
-		materials.put("snow", Material.snow);
-		materials.put("craftedSnow", Material.craftedSnow);
-		materials.put("cactus", Material.cactus);
-		materials.put("clay", Material.clay);
-		materials.put("gourd", Material.gourd);
-		materials.put("dragonEgg", Material.dragonEgg);
-		materials.put("portal", Material.portal);
-		materials.put("cake", Material.cake);
-		materials.put("web", Material.web);
+		materials.put("air", Material.AIR);
+		materials.put("grass", Material.GRASS);
+		materials.put("ground", Material.GROUND);
+		materials.put("wood", Material.WOOD);
+		materials.put("rock", Material.ROCK);
+		materials.put("iron", Material.IRON);
+		materials.put("anvil", Material.ANVIL);
+		materials.put("water", Material.WATER);
+		materials.put("lava", Material.LAVA);
+		materials.put("leaves", Material.LEAVES);
+		materials.put("plants", Material.PLANTS);
+		materials.put("vine", Material.VINE);
+		materials.put("sponge", Material.SPONGE);
+		materials.put("cloth", Material.CLOTH);
+		materials.put("fire", Material.FIRE);
+		materials.put("sand", Material.SAND);
+		materials.put("circuits", Material.CIRCUITS);
+		materials.put("carpet", Material.CARPET);
+		materials.put("glass", Material.GLASS);
+		materials.put("redstoneLight", Material.REDSTONE_LIGHT);
+		materials.put("tnt", Material.TNT);
+		materials.put("coral", Material.CORAL);
+		materials.put("ice", Material.ICE);
+		materials.put("packedIce", Material.PACKED_ICE);
+		materials.put("snow", Material.SNOW);
+		materials.put("craftedSnow", Material.CRAFTED_SNOW);
+		materials.put("cactus", Material.CACTUS);
+		materials.put("clay", Material.CLAY);
+		materials.put("gourd", Material.GOURD);
+		materials.put("dragonEgg", Material.DRAGON_EGG);
+		materials.put("portal", Material.PORTAL);
+		materials.put("cake", Material.CAKE);
+		materials.put("web", Material.WEB);
 
 		soundTypes.put("stone", SoundType.STONE);
 		soundTypes.put("wood", SoundType.WOOD);
@@ -121,7 +121,7 @@ public class BlockDescriptor
 	public Material getMaterial()
 	{
 		Material mat = materials.get(material);
-		return mat != null ? mat : Material.wood;
+		return mat != null ? mat : Material.WOOD;
 	}
 
 	public SoundType getSoundType()

@@ -42,7 +42,7 @@ public class DDBTab extends CreativeTabs
 	@Override
 	public Item getTabIconItem()
 	{
-		return Items.flint_and_steel;
+		return Items.FLINT_AND_STEEL;
 	}
 
 }
