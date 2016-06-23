@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import net.malisis.core.asm.AsmUtils;
-import net.malisis.core.renderer.icon.MalisisIcon;
+import net.malisis.core.renderer.icon.Icon;
 import net.malisis.core.renderer.icon.VanillaIcon;
 import net.malisis.core.util.ItemUtils;
 import net.malisis.core.util.Silenced;
@@ -60,9 +60,10 @@ import com.google.gson.JsonParser;
  * @author Ordinastie
  *
  */
-public class DDBIcon extends MalisisIcon
+public class DDBIcon extends Icon
 {
-	private final static Field animationMetadataField = AsmUtils.changeFieldAccess(TextureAtlasSprite.class, "animationMetadata",
+	private final static Field animationMetadataField = AsmUtils.changeFieldAccess(TextureAtlasSprite.class,
+			"animationMetadata",
 			"field_110982_k");
 
 	private final static IMetadataSerializer serializer = new IMetadataSerializer();
@@ -76,7 +77,7 @@ public class DDBIcon extends MalisisIcon
 
 	public DDBIcon(String name, BlockPack pack, String path)
 	{
-		super(name);
+		super(pack.getName() + "_" + name);
 		this.pack = pack;
 		this.path = path;
 	}
@@ -209,16 +210,20 @@ public class DDBIcon extends MalisisIcon
 		}
 	}
 
-	public static MalisisIcon getIcon(String name, BlockPack pack, String path)
+	public static Icon getIcon(String name, BlockPack pack, String path)
 	{
 		if (path.indexOf(":") != -1)
 		{
 			ItemStack itemStack = ItemUtils.getItemStack(path);
 			if (itemStack == null)
-				return MalisisIcon.missing;
+				return Icon.missing;
 
 			return new VanillaIcon(itemStack.getItem(), itemStack.getMetadata());
 		}
+
+		Icon icon = getRegistered(pack.getName() + "_" + name);
+		if (icon != null)
+			return icon;
 
 		return new DDBIcon(name, pack, path);
 	}

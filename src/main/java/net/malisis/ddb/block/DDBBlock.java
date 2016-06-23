@@ -24,18 +24,19 @@
 
 package net.malisis.ddb.block;
 
+import java.util.stream.Stream;
+
 import net.malisis.core.block.MalisisBlock;
 import net.malisis.core.block.component.ColorComponent;
 import net.malisis.core.block.component.DirectionalComponent;
 import net.malisis.core.block.component.PaneComponent;
 import net.malisis.core.block.component.StairComponent;
 import net.malisis.core.block.component.WallComponent;
-import net.malisis.core.renderer.icon.MalisisIcon;
-import net.malisis.core.renderer.icon.provider.ConnectedIconsProvider;
+import net.malisis.core.renderer.icon.Icon;
+import net.malisis.core.renderer.icon.provider.IIconProvider;
+import net.malisis.core.renderer.icon.provider.IconProviderBuilder;
 import net.malisis.core.renderer.icon.provider.MegaTextureIconProvider;
 import net.malisis.core.renderer.icon.provider.PropertyEnumIconProvider;
-import net.malisis.core.renderer.icon.provider.SidesIconProvider;
-import net.malisis.core.renderer.icon.provider.WallIconProvider;
 import net.malisis.ddb.BlockDescriptor;
 import net.malisis.ddb.BlockPack;
 import net.malisis.ddb.BlockType;
@@ -53,6 +54,8 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import org.apache.commons.lang3.StringUtils;
+
+import com.google.common.base.Predicates;
 
 /**
  * @author Ordinastie
@@ -111,29 +114,26 @@ public class DDBBlock extends MalisisBlock
 		return descriptor.type;
 	}
 
-	@Override
 	@SideOnly(Side.CLIENT)
-	public void createIconProvider(Object object)
+	public IIconProvider createIconProvider(Object object)
 	{
-		MalisisIcon defaultIcon = null;
+		Icon defaultIcon = null;
 
 		if (descriptor.type == BlockType.MEGATEXTURE)
 		{
-			defaultIcon = new DDBIcon(getName(), pack, descriptor.getTexture());
+			defaultIcon = DDBIcon.getIcon(getName(), pack, descriptor.getTexture());
 			MegaTextureIconProvider iconProvider = new MegaTextureIconProvider(defaultIcon);
 			for (EnumFacing facing : EnumFacing.VALUES)
 				iconProvider.setMegaTexture(facing, defaultIcon, descriptor.numBlocks);
 
-			this.iconProvider = iconProvider;
-			return;
+			return iconProvider;
 		}
 		else if (descriptor.type == BlockType.CONNECTED)
 		{
-			MalisisIcon part1 = new DDBIcon(getName(), pack, descriptor.getTexture());
-			MalisisIcon part2 = new DDBIcon(getName() + "2", pack, descriptor.getTexture() + "2");
+			Icon part1 = DDBIcon.getIcon(getName(), pack, descriptor.getTexture());
+			Icon part2 = DDBIcon.getIcon(getName() + "2", pack, descriptor.getTexture() + "2");
 
-			iconProvider = new ConnectedIconsProvider(part1, part2);
-			return;
+			return IIconProvider.create(part1).wall(part2).build();
 		}
 		else if (descriptor.type == BlockType.COLORED && !descriptor.useColorMultiplier)
 		{
@@ -146,8 +146,7 @@ public class DDBBlock extends MalisisBlock
 				iconProvider.setIcon(color, icon);
 			}
 
-			this.iconProvider = iconProvider;
-			return;
+			return iconProvider;
 		}
 		else if (descriptor.type == BlockType.WALL)
 		{
@@ -156,10 +155,10 @@ public class DDBBlock extends MalisisBlock
 
 			if (!StringUtils.isEmpty(insideName) && !StringUtils.isEmpty(outsideName))
 			{
-				MalisisIcon inside = DDBIcon.getIcon(getName() + "_inside", pack, insideName);
-				MalisisIcon outside = DDBIcon.getIcon(getName() + "_outside", pack, outsideName);
-				this.iconProvider = new WallIconProvider(inside, outside);
-				return;
+				Icon inside = DDBIcon.getIcon(getName() + "_inside", pack, insideName);
+				Icon outside = DDBIcon.getIcon(getName() + "_outside", pack, outsideName);
+
+				return IIconProvider.create(outside).wall(inside).build();
 			}
 			else
 			{
@@ -170,18 +169,25 @@ public class DDBBlock extends MalisisBlock
 			}
 		}
 
-		MalisisIcon[] sideIcons = new MalisisIcon[6];
-		for (EnumFacing dir : EnumFacing.VALUES)
-		{
-			String textureName = descriptor.getTexture(dir);
+		String defaultName = Stream.of(EnumFacing.VALUES)
+									.map(descriptor::getTexture)
+									.filter(Predicates.not(StringUtils::isEmpty)::apply)
+									.findFirst()
+									.orElse(null);
 
+		if (defaultName == null)
+			return IIconProvider.create(DDBIcon.getIcon(name, pack, descriptor.getTexture())).build();
+
+		IconProviderBuilder builder = IIconProvider.create(DDBIcon.getIcon(defaultName, pack, defaultName));
+
+		for (EnumFacing side : EnumFacing.VALUES)
+		{
+			String textureName = descriptor.getTexture(side);
 			if (textureName != null)
-				sideIcons[dir.ordinal()] = DDBIcon.getIcon(name + "_" + dir.toString(), pack, textureName);
-			else if (defaultIcon == null)
-				defaultIcon = DDBIcon.getIcon(name, pack, descriptor.getTexture());
+				builder.withSide(side, DDBIcon.getIcon(name + "_" + side.toString(), pack, textureName));
 		}
 
-		iconProvider = new SidesIconProvider(defaultIcon, sideIcons);
+		return builder.build();
 	}
 
 	@Override
