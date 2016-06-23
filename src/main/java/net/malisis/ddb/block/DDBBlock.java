@@ -26,10 +26,14 @@ package net.malisis.ddb.block;
 
 import java.util.stream.Stream;
 
+import net.malisis.core.MalisisCore;
 import net.malisis.core.block.MalisisBlock;
 import net.malisis.core.block.component.ColorComponent;
+import net.malisis.core.block.component.CornerComponent;
 import net.malisis.core.block.component.DirectionalComponent;
 import net.malisis.core.block.component.PaneComponent;
+import net.malisis.core.block.component.SlopeComponent;
+import net.malisis.core.block.component.SlopedCornerComponent;
 import net.malisis.core.block.component.StairComponent;
 import net.malisis.core.block.component.WallComponent;
 import net.malisis.core.renderer.icon.Icon;
@@ -98,9 +102,21 @@ public class DDBBlock extends MalisisBlock
 			case PANE:
 				addComponent(new PaneComponent());
 				break;
+			case SLOPE:
+				addComponent(new SlopeComponent());
+				break;
+			case CORNER:
+				addComponent(new CornerComponent());
+				break;
+			case SLOPEDCORNER:
+				addComponent(new SlopedCornerComponent());
+				break;
 			default:
 				break;
 		}
+
+		if (MalisisCore.isClient())
+			addComponent(createIconProvider());
 	}
 
 	@Override
@@ -115,7 +131,7 @@ public class DDBBlock extends MalisisBlock
 	}
 
 	@SideOnly(Side.CLIENT)
-	public IIconProvider createIconProvider(Object object)
+	public IIconProvider createIconProvider()
 	{
 		Icon defaultIcon = null;
 

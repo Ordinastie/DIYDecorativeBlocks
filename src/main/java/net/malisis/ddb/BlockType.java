@@ -52,7 +52,13 @@ public enum BlockType implements IMSerializable
 	@SerializedName("wall")
 	WALL,
 	@SerializedName("pane")
-	PANE,;
+	PANE,
+	@SerializedName("slope")
+	SLOPE,
+	@SerializedName("corner")
+	CORNER,
+	@SerializedName("slopedCorner")
+	SLOPEDCORNER,;
 	//@formatter:on
 
 }
