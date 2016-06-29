@@ -47,7 +47,7 @@ import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.client.resources.data.AnimationFrame;
 import net.minecraft.client.resources.data.AnimationMetadataSection;
 import net.minecraft.client.resources.data.AnimationMetadataSectionSerializer;
-import net.minecraft.client.resources.data.IMetadataSerializer;
+import net.minecraft.client.resources.data.MetadataSerializer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
@@ -66,7 +66,7 @@ public class DDBIcon extends Icon
 			"animationMetadata",
 			"field_110982_k");
 
-	private final static IMetadataSerializer serializer = new IMetadataSerializer();
+	private final static MetadataSerializer serializer = new MetadataSerializer();
 	static
 	{
 		serializer.registerMetadataSectionType(new AnimationMetadataSectionSerializer(), AnimationMetadataSection.class);
