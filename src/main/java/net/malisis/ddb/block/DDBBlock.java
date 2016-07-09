@@ -46,6 +46,7 @@ import net.malisis.ddb.BlockPack;
 import net.malisis.ddb.BlockType;
 import net.malisis.ddb.DDB;
 import net.malisis.ddb.DDBIcon;
+import net.malisis.ddb.DDBRecipe;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.crafting.IRecipe;
@@ -241,9 +242,12 @@ public class DDBBlock extends MalisisBlock
 
 	public void registerRecipes()
 	{
-		IRecipe recipe = descriptor.recipe != null ? descriptor.recipe.createRecipe(this) : null;
-		if (recipe != null)
-			GameRegistry.addRecipe(recipe);
+		for (DDBRecipe r : descriptor.recipes)
+		{
+			IRecipe recipe = r.createRecipe(this);
+			if (recipe != null)
+				GameRegistry.addRecipe(recipe);
+		}
 
 		if (descriptor.furnaceRecipe != null)
 			descriptor.furnaceRecipe.addFurnaceRecipe(this);
