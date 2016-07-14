@@ -150,7 +150,7 @@ public class DDBBlock extends MalisisBlock
 			Icon part1 = DDBIcon.getIcon(getName(), pack, descriptor.getTexture());
 			Icon part2 = DDBIcon.getIcon(getName() + "2", pack, descriptor.getTexture() + "2");
 
-			return IIconProvider.create(part1).wall(part2).build();
+			return IIconProvider.create(part1).connectedWith(part2).build();
 		}
 		else if (descriptor.type == BlockType.COLORED && !descriptor.useColorMultiplier)
 		{
@@ -225,11 +225,11 @@ public class DDBBlock extends MalisisBlock
 	}
 
 	@Override
-	public boolean shouldCheckWeakPower(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side)
+	public boolean shouldSideBeRendered(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side)
 	{
 		//Called for CONNECTED
 		if (!isOpaqueCube(state))
-			if (world.getBlockState(pos).getBlock() == world.getBlockState(pos.offset(side.getOpposite())).getBlock())
+			if (world.getBlockState(pos).getBlock() == world.getBlockState(pos.offset(side)).getBlock())
 				return false;
 		return super.shouldSideBeRendered(state, world, pos, side);
 	}
