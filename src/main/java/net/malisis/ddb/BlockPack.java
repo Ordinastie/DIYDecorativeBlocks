@@ -93,8 +93,14 @@ public class BlockPack
 		this.zipFile = zipFile;
 
 		if (MalisisCore.isClient())
-			((IReloadableResourceManager) Minecraft.getMinecraft().getResourceManager()).registerReloadListener(new Reloader());
+			registerReloadListener();
 
+	}
+
+	@SideOnly(Side.CLIENT)
+	private void registerReloadListener()
+	{
+		((IReloadableResourceManager) Minecraft.getMinecraft().getResourceManager()).registerReloadListener(new Reloader());
 	}
 
 	/**
