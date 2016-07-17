@@ -229,7 +229,7 @@ public class DDBBlock extends MalisisBlock
 	{
 		//Called for CONNECTED
 		if (!isOpaqueCube(state))
-			if (world.getBlockState(pos).getBlock() == world.getBlockState(pos.offset(side.getOpposite())).getBlock())
+			if (world.getBlockState(pos).getBlock() == world.getBlockState(pos.offset(side)).getBlock())
 				return false;
 		return super.shouldSideBeRendered(state, world, pos, side);
 	}
