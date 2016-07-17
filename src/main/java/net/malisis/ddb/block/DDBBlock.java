@@ -46,6 +46,7 @@ import net.malisis.ddb.BlockPack;
 import net.malisis.ddb.BlockType;
 import net.malisis.ddb.DDB;
 import net.malisis.ddb.DDBIcon;
+import net.malisis.ddb.DDBRecipe;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.crafting.IRecipe;
@@ -149,7 +150,7 @@ public class DDBBlock extends MalisisBlock
 			Icon part1 = DDBIcon.getIcon(getName(), pack, descriptor.getTexture());
 			Icon part2 = DDBIcon.getIcon(getName() + "2", pack, descriptor.getTexture() + "2");
 
-			return IIconProvider.create(part1).wall(part2).build();
+			return IIconProvider.create(part1).connectedWith(part2).build();
 		}
 		else if (descriptor.type == BlockType.COLORED && !descriptor.useColorMultiplier)
 		{
@@ -224,7 +225,7 @@ public class DDBBlock extends MalisisBlock
 	}
 
 	@Override
-	public boolean shouldCheckWeakPower(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side)
+	public boolean shouldSideBeRendered(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side)
 	{
 		//Called for CONNECTED
 		if (!isOpaqueCube(state))
@@ -241,9 +242,12 @@ public class DDBBlock extends MalisisBlock
 
 	public void registerRecipes()
 	{
-		IRecipe recipe = descriptor.recipe != null ? descriptor.recipe.createRecipe(this) : null;
-		if (recipe != null)
-			GameRegistry.addRecipe(recipe);
+		for (DDBRecipe r : descriptor.recipes)
+		{
+			IRecipe recipe = r.createRecipe(this);
+			if (recipe != null)
+				GameRegistry.addRecipe(recipe);
+		}
 
 		if (descriptor.furnaceRecipe != null)
 			descriptor.furnaceRecipe.addFurnaceRecipe(this);

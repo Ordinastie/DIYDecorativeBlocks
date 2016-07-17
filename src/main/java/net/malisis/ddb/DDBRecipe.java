@@ -48,6 +48,7 @@ public class DDBRecipe
 {
 	public String[][] items;
 	public int amount = 1;
+	public int metadata = 0;
 	public boolean shapeless = false;
 
 	private Object getItem(String str)
@@ -81,7 +82,7 @@ public class DDBRecipe
 				recipe.add(item);
 			}
 
-		return new ShapelessOreRecipe(new ItemStack(block, amount, 0), recipe.toArray());
+		return new ShapelessOreRecipe(new ItemStack(block, amount, metadata), recipe.toArray());
 	}
 
 	public IRecipe createShapedRecipe(DDBBlock block)
@@ -112,7 +113,7 @@ public class DDBRecipe
 		}
 
 		strRecipes.addAll(recipe);
-		return new ShapedOreRecipe(new ItemStack(block, amount, 0), strRecipes.toArray());
+		return new ShapedOreRecipe(new ItemStack(block, amount, metadata), strRecipes.toArray());
 	}
 
 	@Override
