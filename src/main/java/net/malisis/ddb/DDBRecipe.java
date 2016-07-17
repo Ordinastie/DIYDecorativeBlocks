@@ -82,7 +82,7 @@ public class DDBRecipe
 				recipe.add(item);
 			}
 
-		return new ShapelessOreRecipe(new ItemStack(block, amount, 0), recipe.toArray());
+		return new ShapelessOreRecipe(new ItemStack(block, amount, metadata), recipe.toArray());
 	}
 
 	public IRecipe createShapedRecipe(DDBBlock block)
