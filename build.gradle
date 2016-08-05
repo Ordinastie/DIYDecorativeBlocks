@@ -37,7 +37,7 @@ ext.url = 'http://github.com/Ordinastie/DIYDecorativeBlocks'
 dependencies
 {
 	//compile 'net.malisis:malisiscore:1.8.9-2.1.1:dev'
-	compile files('../MalisisCore/build/libs/malisiscore-1.9.4-4.0.0-dev.jar')	
+	compile files('../MalisisCore/build/libs/malisiscore-1.9.4-4.1.1-dev.jar')	
 }
 
 
