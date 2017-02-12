@@ -26,6 +26,10 @@ package net.malisis.ddb.block;
 
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.StringUtils;
+
+import com.google.common.base.Predicates;
+
 import net.malisis.core.MalisisCore;
 import net.malisis.core.block.MalisisBlock;
 import net.malisis.core.block.component.ColorComponent;
@@ -47,6 +51,7 @@ import net.malisis.ddb.BlockType;
 import net.malisis.ddb.DDB;
 import net.malisis.ddb.DDBIcon;
 import net.malisis.ddb.DDBRecipe;
+import net.minecraft.block.BlockColored;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.crafting.IRecipe;
@@ -57,10 +62,6 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-
-import org.apache.commons.lang3.StringUtils;
-
-import com.google.common.base.Predicates;
 
 /**
  * @author Ordinastie
@@ -155,7 +156,7 @@ public class DDBBlock extends MalisisBlock
 		else if (descriptor.type == BlockType.COLORED && !descriptor.useColorMultiplier)
 		{
 			//DDBIcon defaultIcon = new DDBIcon(name, pack, descriptor.getTexture());
-			PropertyEnumIconProvider<EnumDyeColor> iconProvider = new PropertyEnumIconProvider<>(ColorComponent.COLOR, EnumDyeColor.class);
+			PropertyEnumIconProvider<EnumDyeColor> iconProvider = new PropertyEnumIconProvider<>(BlockColored.COLOR, EnumDyeColor.class);
 			for (EnumDyeColor color : EnumDyeColor.values())
 			{
 				String name = getName() + "_" + color.getUnlocalizedName();
@@ -186,7 +187,7 @@ public class DDBBlock extends MalisisBlock
 			}
 		}
 
-		String defaultName = Stream.of(EnumFacing.VALUES)
+		String defaultName = Stream	.of(EnumFacing.VALUES)
 									.map(descriptor::getTexture)
 									.filter(Predicates.not(StringUtils::isEmpty)::apply)
 									.findFirst()
@@ -217,7 +218,7 @@ public class DDBBlock extends MalisisBlock
 	}
 
 	@Override
-	public boolean canRenderInLayer(BlockRenderLayer layer)
+	public boolean canRenderInLayer(IBlockState state, BlockRenderLayer layer)
 	{
 		if (descriptor.translucent)
 			return layer == BlockRenderLayer.TRANSLUCENT;
