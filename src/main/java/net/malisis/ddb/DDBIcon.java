@@ -34,9 +34,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import org.apache.commons.io.IOUtils;
+
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import net.malisis.core.asm.AsmUtils;
 import net.malisis.core.renderer.icon.Icon;
-import net.malisis.core.renderer.icon.VanillaIcon;
 import net.malisis.core.util.ItemUtils;
 import net.malisis.core.util.Silenced;
 import net.minecraft.client.Minecraft;
@@ -51,20 +55,15 @@ import net.minecraft.client.resources.data.MetadataSerializer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
-import org.apache.commons.io.IOUtils;
-
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-
 /**
  * @author Ordinastie
  *
  */
 public class DDBIcon extends Icon
 {
-	private final static Field animationMetadataField = AsmUtils.changeFieldAccess(TextureAtlasSprite.class,
-			"animationMetadata",
-			"field_110982_k");
+	private final static Field animationMetadataField = AsmUtils.changeFieldAccess(	TextureAtlasSprite.class,
+																					"animationMetadata",
+																					"field_110982_k");
 
 	private final static MetadataSerializer serializer = new MetadataSerializer();
 	static
@@ -165,8 +164,11 @@ public class DDBIcon extends Icon
 		is2.close();
 
 		if (hasFrameCount)
-			animMetadata = new AnimationMetadataSection(list, this.width, this.height, animMetadata.getFrameTime(),
-					animMetadata.isInterpolate());
+			animMetadata = new AnimationMetadataSection(list,
+														this.width,
+														this.height,
+														animMetadata.getFrameTime(),
+														animMetadata.isInterpolate());
 
 		saveAnimationMetadata(animMetadata);
 	}
@@ -218,13 +220,15 @@ public class DDBIcon extends Icon
 			if (itemStack == null)
 				return Icon.missing;
 
-			return new VanillaIcon(itemStack.getItem(), itemStack.getMetadata());
+			return Icon.from(itemStack.getItem(), itemStack.getMetadata());
 		}
 
 		Icon icon = getRegistered(pack.getName() + "_" + name);
 		if (icon != null)
 			return icon;
 
-		return new DDBIcon(name, pack, path);
+		icon = new DDBIcon(name, pack, path);
+		registeredIcons.put(icon.getIconName(), icon);
+		return icon;
 	}
 }

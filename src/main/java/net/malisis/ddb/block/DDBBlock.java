@@ -160,7 +160,7 @@ public class DDBBlock extends MalisisBlock
 			for (EnumDyeColor color : EnumDyeColor.values())
 			{
 				String name = getName() + "_" + color.getUnlocalizedName();
-				DDBIcon icon = new DDBIcon(name, pack, descriptor.getTexture() + "_" + color.getUnlocalizedName());
+				Icon icon = DDBIcon.getIcon(name, pack, descriptor.getTexture() + "_" + color.getUnlocalizedName());
 				iconProvider.setIcon(color, icon);
 			}
 
