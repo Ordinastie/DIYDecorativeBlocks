@@ -32,6 +32,10 @@ import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import org.apache.commons.io.FileUtils;
+
+import com.google.common.collect.Maps;
+
 import net.malisis.core.MalisisCore;
 import net.malisis.core.asm.AsmUtils;
 import net.malisis.core.block.IComponent;
@@ -47,10 +51,6 @@ import net.minecraft.util.text.translation.LanguageMap;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import org.apache.commons.io.FileUtils;
-
-import com.google.common.collect.Maps;
-
 /**
  * @author Ordinastie
  *
@@ -65,7 +65,7 @@ public class BlockPack
 		try
 		{
 			LanguageMap languageMap = (LanguageMap) AsmUtils.changeFieldAccess(LanguageMap.class, "instance", "field_74817_a").get(null);
-			languageList = (Map<String, String>) AsmUtils.changeFieldAccess(LanguageMap.class, "languageList", "field_74816_c")
+			languageList = (Map<String, String>) AsmUtils	.changeFieldAccess(LanguageMap.class, "languageList", "field_74816_c")
 															.get(languageMap);
 		}
 		catch (ReflectiveOperationException e)
@@ -77,7 +77,8 @@ public class BlockPack
 
 	public enum Type
 	{
-		FOLDER, ZIP
+		FOLDER,
+		ZIP
 	};
 
 	private Type type;
@@ -106,7 +107,7 @@ public class BlockPack
 	/**
 	 * Gets the name of this {@link BlockPack}.
 	 *
-	 * @return
+	 * @return the name
 	 */
 	public String getName()
 	{
@@ -114,9 +115,9 @@ public class BlockPack
 	}
 
 	/**
-	 * Gets the type of this {@link BlockPack}
+	 * Gets the type of this {@link BlockPack}.
 	 *
-	 * @return
+	 * @return the type
 	 */
 	public Type getType()
 	{
@@ -126,7 +127,7 @@ public class BlockPack
 	/**
 	 * Gets the working directory of this {@link BlockPack}.
 	 *
-	 * @return
+	 * @return the directory
 	 */
 	public String getDirectory()
 	{
@@ -136,9 +137,9 @@ public class BlockPack
 	/**
 	 * Gets an inputStream from this {@link BlockPack} for the <i>path</i>.
 	 *
-	 * @param path
-	 * @return
-	 * @throws IOException
+	 * @param path the path
+	 * @return the input stream
+	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
 	public InputStream getInputStream(String path) throws IOException
 	{
@@ -163,8 +164,8 @@ public class BlockPack
 	/**
 	 * Gets the {@link DDBBlock} with the specified <i>name</i>.
 	 *
-	 * @param name
-	 * @return
+	 * @param name the name
+	 * @return the block
 	 */
 	public DDBBlock getBlock(String name)
 	{
@@ -183,7 +184,7 @@ public class BlockPack
 
 	private void readLangFiles()
 	{
-		//always load the english localization
+		//always load the English localization
 		loadLang("en_US");
 		Language current = Minecraft.getMinecraft().getLanguageManager().getCurrentLanguage();
 		if (current != null && !"en_US".equals(current.getLanguageCode()))

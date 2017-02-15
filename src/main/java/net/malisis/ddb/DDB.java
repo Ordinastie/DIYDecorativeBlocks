@@ -28,6 +28,9 @@ import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import net.malisis.core.IMalisisMod;
 import net.malisis.core.MalisisCore;
 import net.malisis.core.configuration.Settings;
@@ -39,9 +42,6 @@ import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.Mod.Instance;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 /**
  * @author Ordinastie
@@ -128,7 +128,7 @@ public class DDB implements IMalisisMod
 	/**
 	 * Gets the list of registered <code>BlockPack</code>.
 	 *
-	 * @return
+	 * @return the list packs
 	 */
 	public static Collection<BlockPack> getListPacks()
 	{
