@@ -27,19 +27,27 @@ package net.malisis.ddb;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import org.apache.commons.io.FileUtils;
 
 import com.google.common.collect.Maps;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 
 import net.malisis.core.MalisisCore;
 import net.malisis.core.asm.AsmUtils;
-import net.malisis.core.block.IComponent;
-import net.malisis.core.block.component.SlabComponent;
 import net.malisis.core.util.Silenced;
 import net.malisis.ddb.block.DDBBlock;
 import net.minecraft.client.Minecraft;
@@ -47,7 +55,13 @@ import net.minecraft.client.resources.IReloadableResourceManager;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.client.resources.IResourceManagerReloadListener;
 import net.minecraft.client.resources.Language;
+import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.util.JsonUtils;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.translation.LanguageMap;
+import net.minecraftforge.common.crafting.CraftingHelper;
+import net.minecraftforge.common.crafting.JsonContext;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -85,7 +99,7 @@ public class BlockPack
 	private String name;
 	private ZipFile zipFile;
 
-	private HashMap<String, DDBBlock> blocks = new HashMap<>();
+	private HashMap<ResourceLocation, DDBBlock> blocks = new HashMap<>();
 
 	public BlockPack(Type type, String name, ZipFile zipFile)
 	{
@@ -95,7 +109,6 @@ public class BlockPack
 
 		if (MalisisCore.isClient())
 			registerReloadListener();
-
 	}
 
 	@SideOnly(Side.CLIENT)
@@ -161,13 +174,39 @@ public class BlockPack
 		throw new IOException("Undetermined pack type : " + type);
 	}
 
+	public List<String> listFiles(String path)
+	{
+		return listFiles(path, p -> true);
+	}
+
+	public List<String> listFiles(String path, Predicate<String> predicate)
+	{
+		if (type == Type.FOLDER)
+		{
+			File file = new File(getDirectory() + path);
+			if (!file.isDirectory())
+				return Collections.emptyList();
+			Collection<File> files = FileUtils.listFiles(file, null, true);
+			return files.stream()
+						.map(File::getPath)
+						.map(p -> p.replace(getDirectory().replace("/", "\\"), ""))
+						.filter(predicate)
+						.collect(Collectors.toList());
+
+		}
+		else
+		{
+			return zipFile.stream().map(ZipEntry::getName).filter(p -> p.startsWith(path)).filter(predicate).collect(Collectors.toList());
+		}
+	}
+
 	/**
 	 * Gets the {@link DDBBlock} with the specified <i>name</i>.
 	 *
 	 * @param name the name
 	 * @return the block
 	 */
-	public DDBBlock getBlock(String name)
+	public DDBBlock getBlock(ResourceLocation name)
 	{
 		return blocks.get(name);
 	}
@@ -184,7 +223,7 @@ public class BlockPack
 
 	private void readLangFiles()
 	{
-		//always load the english localization
+		//always load the English localization
 		loadLang("en_US");
 		Language current = Minecraft.getMinecraft().getLanguageManager().getCurrentLanguage();
 		if (current != null && !"en_US".equals(current.getLanguageCode()))
@@ -197,23 +236,46 @@ public class BlockPack
 		languageList.putAll(map);
 	}
 
+	private void readRecipes()
+	{
+		JsonContext ctx = new JsonContext(DDB.modid);
+		Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+		List<String> files = listFiles("recipes/", p -> p.endsWith(".json"));
+
+		for (String fileName : files)
+		{
+			ResourceLocation key = new ResourceLocation(ctx.getModId(), fileName.replace("recipes\\", name + "_").replace(".json", ""));
+			//key = ddb:{packname}_{file}
+
+			try (Reader reader = new InputStreamReader(getInputStream(fileName), "UTF-8"))
+			{
+				JsonObject json = JsonUtils.fromJson(gson, reader, JsonObject.class);
+				if (json.has("conditions") && !CraftingHelper.processConditions(JsonUtils.getJsonArray(json, "conditions"), ctx))
+					continue;
+				IRecipe recipe = CraftingHelper.getRecipe(json, ctx);
+				ForgeRegistries.RECIPES.register(recipe.setRegistryName(key));
+			}
+			catch (Exception e)
+			{
+				DDB.log.error("Failed to read recipe {}.json in pack {} : {}", fileName, this.name, e.getMessage());
+			}
+		}
+
+	}
+
 	/**
 	 * Registers all the block of this {@link BlockPack} to the GameRegistry
 	 */
 	public void registerBlocks()
 	{
-		for (DDBBlock block : blocks.values())
-		{
-			SlabComponent sc = IComponent.getComponent(SlabComponent.class, block);
-			if (sc != null)
-				sc.register();
-			else
-				block.register();
-		}
+		blocks.values().forEach(DDBBlock::register);
 	}
 
 	public void registerRecipes()
 	{
+		readRecipes();
+
+		//register furnace recipes
 		for (DDBBlock block : blocks.values())
 		{
 			block.registerRecipes();

@@ -25,16 +25,13 @@
 package net.malisis.ddb;
 
 import java.util.HashMap;
-import java.util.List;
 
-import net.malisis.core.block.component.SlabComponent;
+import com.google.gson.internal.LinkedTreeMap;
+
 import net.malisis.ddb.block.DDBBlock;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.util.EnumFacing;
-
-import com.google.common.collect.Lists;
-import com.google.gson.internal.LinkedTreeMap;
 
 /**
  * @author Ordinastie
@@ -108,14 +105,11 @@ public class BlockDescriptor
 	public boolean translucent = false;
 	public int lightValue = 0;
 	public int numBlocks = -1;
-	public List<DDBRecipe> recipes = Lists.newArrayList();
 	public DDBSmeltingRecipe furnaceRecipe;
 
 	public void createBlock(BlockPack pack)
 	{
 		DDBBlock block = new DDBBlock(pack, this);
-		if (type == BlockType.SLAB)
-			new SlabComponent(block, new DDBBlock(pack, this));
 
 		pack.addBlock(block);
 	}
