@@ -31,6 +31,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -88,7 +89,7 @@ public class DDBIcon extends Icon
 	}
 
 	@Override
-	public boolean load(IResourceManager manager, ResourceLocation location)
+	public boolean load(IResourceManager manager, ResourceLocation location, Function<ResourceLocation, TextureAtlasSprite> textureGetter)
 	{
 		try
 		{

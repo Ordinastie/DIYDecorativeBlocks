@@ -37,6 +37,7 @@ import net.malisis.core.configuration.Settings;
 import net.malisis.ddb.block.DDBBlock;
 import net.malisis.ddb.json.BlockPackJsonReader;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.Mod.Instance;
@@ -160,14 +161,14 @@ public class DDB implements IMalisisMod
 	}
 
 	/**
-	 * Gets a <code>DDBBlock</code> from the <i>packName</i> <code>BlockPack</code> with the specified <i>blocName</i>
+	 * Gets a <code>DDBBlock</code> from the <i>packName</i> <code>BlockPack</code> with the specified <i>blocName</i>.
 	 *
-	 * @param packName
-	 * @param blockName
+	 * @param packName the pack name
+	 * @param blockName the block name
 	 * @return the <code>DDBBlock</code> if found or <b>null</b> if the <i>packName</i> doesn't match any pack registered or if the
 	 *         <i>blockName</i> doesn't match any block registered for that pack
 	 */
-	public static DDBBlock getBlock(String packName, String blockName)
+	public static DDBBlock getBlock(String packName, ResourceLocation blockName)
 	{
 		BlockPack pack = getPack(packName);
 		if (pack == null)
