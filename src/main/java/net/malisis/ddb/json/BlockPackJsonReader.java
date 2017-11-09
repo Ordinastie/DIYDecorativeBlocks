@@ -33,11 +33,6 @@ import java.lang.reflect.Type;
 import java.util.Map.Entry;
 import java.util.zip.ZipFile;
 
-import net.malisis.ddb.BlockDescriptor;
-import net.malisis.ddb.BlockPack;
-import net.malisis.ddb.BlockType;
-import net.malisis.ddb.DDB;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializationContext;
@@ -47,6 +42,11 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.stream.JsonReader;
+
+import net.malisis.ddb.BlockDescriptor;
+import net.malisis.ddb.BlockPack;
+import net.malisis.ddb.BlockType;
+import net.malisis.ddb.DDB;
 
 /**
  * @author Ordinastie
@@ -94,6 +94,12 @@ public class BlockPackJsonReader
 		catch (IOException e)
 		{
 			DDB.log.error("Skipping {}, couldn't read {}.json : {}", file.getName(), name, e.getMessage());
+			return null;
+		}
+
+		if (inputStream == null)
+		{
+			DDB.log.error("Skipping {}, couldn't find {}.json : {}", file.getName(), name);
 			return null;
 		}
 
